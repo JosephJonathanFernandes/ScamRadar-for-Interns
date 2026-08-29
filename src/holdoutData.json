@@ -1,0 +1,62 @@
+[
+  {
+    "id": "scam_govt_fake",
+    "type": "scam",
+    "description": "Fake government internship using mismatched domain.",
+    "text": "Ministry of IT Internship 2024. \nStipend: ₹15,000/month. \nOnly 10 slots available. Send your resume to admin@nic-internships-india.com immediately to apply."
+  },
+  {
+    "id": "scam_telegram_task",
+    "type": "scam",
+    "description": "Telegram task scam.",
+    "text": "Part time online job! Subscribe to our partner Telegram channels and earn ₹1000 daily. No interview. Direct selection. Message us to start."
+  },
+  {
+    "id": "scam_software_purchase",
+    "type": "scam",
+    "description": "Software purchase scam.",
+    "text": "You are selected for the Graphic Design role. Stipend 30k/month. To begin your remote work, you must purchase the company-licensed Adobe suite for ₹2500 which will be reimbursed in your first salary."
+  },
+  {
+    "id": "scam_vague_data_entry",
+    "type": "scam",
+    "description": "Vague data entry.",
+    "text": "Data Entry Job Work from home. Type captchas and earn cash online easily. Anyone can apply. No experience needed."
+  },
+  {
+    "id": "scam_refundable_deposit",
+    "type": "scam",
+    "description": "Refundable deposit scam.",
+    "text": "Congratulations on your selection at Wipro. Please pay the ₹1500 refundable security deposit to receive your offer letter and company laptop."
+  },
+  {
+    "id": "gen_formal_college",
+    "type": "genuine",
+    "description": "Short formal college email.",
+    "text": "Dear Students, Cisco is visiting the campus for the 6-month internship drive. Stipend is Rs 40,000/month. Interested students can register on the portal by Friday."
+  },
+  {
+    "id": "gen_startup_website",
+    "type": "genuine",
+    "description": "Genuine startup asking to apply via their website.",
+    "text": "We are looking for a marketing intern at Zuddl. This is a paid remote opportunity. If interested, please apply directly on our careers page: zuddl.com/careers"
+  },
+  {
+    "id": "gen_tpo_announcement",
+    "type": "genuine",
+    "description": "TPO message with no urgency.",
+    "text": "Placement Cell Update: TCS has announced their summer internship program. The detailed brochure and eligibility criteria have been sent to your emails."
+  },
+  {
+    "id": "gen_unpaid_startup",
+    "type": "genuine",
+    "description": "Unpaid startup internship for 1 month.",
+    "text": "Hi, we are a seed-stage startup looking for a frontend intern for 1 month. The role is unpaid, but you will get to work closely with the founders on a live product. Email founders@newtech.io"
+  },
+  {
+    "id": "gen_linkedin_dm",
+    "type": "genuine",
+    "description": "Genuine internship via LinkedIn dm.",
+    "text": "Hey! Loved your recent post on React. We are hiring a React intern at our agency, Rs 10k/month. Let me know if you are open to a quick chat next week!"
+  }
+]
