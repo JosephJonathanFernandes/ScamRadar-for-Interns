@@ -1,88 +1,118 @@
-# ScamRadar for Interns 🛡️
+# ScamRadar for Interns 🕵️‍♀️💼
 
-> A privacy-first, zero-latency tool designed to help students instantly detect whether a WhatsApp-forwarded internship offer is genuine or a scam.
+[![CI](https://github.com/yourusername/scamradar-for-interns/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/scamradar-for-interns/actions/workflows/ci.yml)
 
-Every semester, thousands of first- and second-year engineering students receive forwarded internship offers on WhatsApp. Often, these messages lack a verifiable sender or company website, and occasionally, they demand a "registration fee" or sensitive personal documents before any real interview takes place. **ScamRadar for Interns** provides a quick, reliable way to verify these offers before responding.
+A powerful, hybrid scam detection tool designed specifically to protect students and freshers from fraudulent internship offers, fake recruitment drives, and data-entry scams.
 
----
+## Problem Statement
 
-## ⚡ How It Works
+Internship scams are increasingly sophisticated. While some scams are obvious (asking for an upfront "registration fee"), others rely on subtle psychological manipulation—using artificial urgency, spoofing legitimate company domains, and offering vague roles to harvest sensitive personal data (Aadhaar, PAN) or extract free labor.
 
-Paste the message text (or upload a screenshot), and ScamRadar analyzes it using a powerful dual-layer architecture:
+ScamRadar for Interns solves this by analyzing the text of recruitment messages using a two-tiered architecture: a fast, offline rule engine for known patterns, and an AI-powered fallback for ambiguous edge cases.
 
-### 1. Rule-Based Engine (Zero-Latency)
-The primary scanner instantly checks for the most damaging scam patterns:
-- Upfront payment or "refundable deposit" requests.
-- Personal email domains (`@gmail.com`) posing as corporate recruiters.
-- Artificial urgency and high-pressure tactics.
-- Vague role descriptions paired with unrealistic stipends.
-- Unwarranted requests for sensitive information (Aadhaar, PAN, bank details).
+## The Hybrid Architecture
 
-### 2. AI Second-Opinion Layer (Fallback)
-For cases where the rule-based engine cannot confidently classify the message, it is securely sent to an LLM (powered by Groq) for a structured second read. This layer catches nuanced phrasing and subtle intent that strict regex rules might miss.
+Our approach prioritizes speed, privacy, and cost-efficiency. By using a rule engine as the first line of defense, we avoid sending every message to an LLM, reserving AI analysis only for nuanced cases.
 
-> [!IMPORTANT]
-> **Privacy First:** The rule-based layer runs first and handles the vast majority of cases locally. Your input never leaves your device unless the AI second-opinion layer specifically needs to run for an ambiguous case—and this is explicitly disclosed in the UI.
-
----
-
-## 🏗️ Architecture & Engineering Decisions
-
-**Stateless & Client-Side by Default**
-No user accounts, no message storage, and no tracking. Everything runs in the browser to protect student privacy. 
-
-**Honest About Its Limits**
-Early validation revealed that a pure rule-based scanner has a hard ceiling. While it reliably catches 100% of known scam patterns (like advance-fee fraud), it can miss novel phrasing. Rather than overpromising, ScamRadar labels a clean verdict as `"No Red Flags Found"` instead of `"Genuine"`, paired with a persistent UI disclaimer.
-
-**The Hybrid Approach**
-The rule-based engine achieved a 0% false-positive rate on our validation sets but missed highly specific synonym variations in holdout testing. The LLM layer specifically targets this gap—handling the phrasing variation that regex structurally cannot—without sacrificing the speed and privacy of running rules-only for obvious cases.
-
-### Flow Diagram
-
-```mermaid
-graph TD
-    A[Message Text / OCR Screenshot] --> B[Rule-based Scanner<br>7 weighted checks]
-    B --> C[Company Verification<br>Domain-mismatch & DuckDuckGo Search]
-    C --> D{Confident Verdict?}
-    D -- Yes<br>Likely Fake --> E[Show Rule-Based Result]
-    D -- No<br>Ambiguous --> F[LLM Second Opinion<br>Serverless Edge Function]
-    F --> G[Combined Result<br>Rules + AI Reasoning]
+```text
+[ Raw Message ] 
+       │
+       ▼
+[ Core Rules Engine ] ────── (Fast, Local Regex/Keyword Scanning)
+       │
+       ├─► High Score? ───── [ Verdict: Likely Fake ] (No API cost)
+       │
+       ├─► Low Score? ────── [ Verdict: No Red Flags Found ]
+       │
+       └─► Ambiguous? 
+               │
+               ▼
+   [ Vercel Edge Proxy ] ─── (Round-robin API Key Rotation)
+               │
+               ▼
+[ Groq API (gpt-oss-20b) ] ─ (Contextual LLM Analysis)
+               │
+               ▼
+      [ Final Verdict ]
 ```
 
----
+### Why a Hybrid Approach?
+During our testing phase, the **rules-only engine achieved a 40% hit rate** on a holdout dataset of sophisticated scams (scams that did not explicitly ask for money). By integrating the LLM fallback for ambiguous cases, our **hit rate increased to 100%** without sacrificing false-positive precision (0% FPR). Read more about our architecture in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-- **Frontend:** React 19, Vite, Tailwind CSS 4
-- **OCR:** `Tesseract.js` (with canvas-based grayscale/contrast preprocessing for accurate WhatsApp screenshot extraction).
-- **AI Layer:** Groq API (`openai/gpt-oss-20b`), orchestrated via a highly resilient Vercel Serverless Edge Function with 4-key round-robin rate-limit protection.
-- **Testing:** In-app developer test suite (`/test`) validating 15 traced real-world cases.
+*   **Frontend**: React + Vite (Vanilla CSS)
+*   **OCR Engine**: Tesseract.js (Client-side image processing)
+*   **LLM API**: Groq (openai/gpt-oss-20b)
+*   **Serverless**: Vercel Serverless Functions (`/api`)
+*   **Testing**: Vitest (Unit tests and Validation datasets)
 
----
+## Repository Structure
 
-## 🚀 Local Setup
+```
+scamradar-for-interns/
+├── src/
+│   ├── App.jsx             # Main Application Logic
+│   ├── components/         # React Components
+│   ├── core/               # Core pure-function business logic
+│   │   ├── scanner.js      # Red-flag rule engine
+│   │   ├── companyCheck.js # Domain similarity & web presence checks
+│   │   └── ocr.js          # Image preprocessing & WhatsApp artifact stripping
+│   └── api/                # Serverless API routes
+│       └── llm-check.js    # Edge function proxy for Groq LLM
+├── tests/
+│   ├── unit/               # Vitest unit test suites
+│   └── fixtures/           # Holdout and validation datasets
+├── scripts/                # Node scripts for evaluating hit-rate
+├── docs/                   # Architecture and walkthrough documentation
+├── public/                 # Static assets
+└── vite.config.js          # Vite config & API proxying for local dev
+```
 
-To run ScamRadar locally:
+## Setup & Development
 
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/yourusername/scamradar-for-interns.git
+    cd scamradar-for-interns
+    ```
+
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Environment Variables**
+    Create a `.env.local` file in the root directory. You can provide up to 5 keys to utilize the round-robin key rotation built into the serverless function.
+    ```env
+    # .env.local
+    GROQ_KEY_1=your_key_1_here
+    GROQ_KEY_2=your_key_2_here
+    ```
+
+4.  **Run Locally**
+    ```bash
+    npm run dev
+    ```
+
+5.  **Run Tests**
+    Execute the unit tests and the validation dataset:
+    ```bash
+    npm test
+    ```
+
+## Validation & Testing
+
+ScamRadar relies heavily on empirical validation. We maintain two datasets:
+- **Validation Dataset (`tests/fixtures/validationData.js`)**: Real-world scams used to tune the rules engine (100% Hit Rate).
+- **Holdout Dataset (`tests/fixtures/holdoutData.json`)**: Unseen scams used to verify the performance of the full hybrid pipeline.
+
+To run the standalone evaluation scripts:
 ```bash
-# 1. Install dependencies
-npm install
-
-# 2. Set up environment variables for the LLM fallback
-cp .env.example .env.local
-
-# 3. Add your Groq API keys to .env.local
-# GROQ_API_KEY_1=your_key_here...
-
-# 4. Start the Vite dev server (includes API proxy)
-npm run dev
+node scripts/run_validation.js
+node scripts/run_holdout.js
 ```
 
-> [!NOTE]
-> The AI second-opinion layer requires at least one Groq API key (free tier available). The primary rule-based scanner works fully offline with no keys at all.
+## Security
 
----
-
-## ⚖️ Disclaimer
-
-*ScamRadar for Interns checks for known scam patterns and structural red flags. A clean result does not guarantee an offer is genuine. Students should always independently verify the company before sharing personal information or making any payment.*
+Please read [SECURITY.md](SECURITY.md) for vulnerability reporting and privacy disclosures regarding the LLM API integration.

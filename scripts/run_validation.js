@@ -1,10 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
-import { checkCompany } from "../src/companyCheck.js";
-import { analyzeMessage } from "../src/scanner.js";
+import { checkCompany } from "../src/core/companyCheck.js";
+import { analyzeMessage } from "../src/core/scanner.js";
 
 async function runValidation() {
-  const dataPath = "C:/Users/Joseph/.gemini/antigravity-ide/brain/4a1feb75-2188-4650-9400-f73092d5a7df/src/validationData.json";
+  const dataPath = path.resolve("./tests/fixtures/validationData.json");
   
   const fileContent = await fs.readFile(dataPath, "utf-8");
   const dataset = JSON.parse(fileContent);

@@ -19,35 +19,40 @@ export const TEST_CASES = [
   {
     id: "scam-1",
     category: "Obvious Scam",
-    description: "All 7 flags — registration fee, personal email, urgency, direct selection, data entry, ₹65k stipend, Aadhaar",
+    description:
+      "All 7 flags — registration fee, personal email, urgency, direct selection, data entry, ₹65k stipend, Aadhaar",
     expectedVerdict: "Likely Fake",
     message: `Congratulations! You have been selected for a work-from-home data entry internship at ABC Corp. Registration fee of ₹499 is required (refundable). Reply within 2 hours to confirm your slot. No interview needed — direct selection only. Contact HR at hr@gmail.com. Stipend: ₹65,000 per month. Please send your Aadhaar number to get started.`,
   },
   {
     id: "scam-2",
     category: "Obvious Scam",
-    description: "Training kit charge + WhatsApp interview + pre-selected + easy WFH + limited seats",
+    description:
+      "Training kit charge + WhatsApp interview + pre-selected + easy WFH + limited seats",
     expectedVerdict: "Likely Fake",
     message: `Dear Candidate, We are pleased to offer you an internship at XYZ Solutions. You have been pre-selected based on your resume. A training kit charge of Rs 800 is required before onboarding. Interview process: WhatsApp interview only — no face-to-face round needed. This is easy work from home. Limited seats available — apply now!`,
   },
   {
     id: "scam-3",
     category: "Obvious Scam",
-    description: "High stipend (₹75k) + Yahoo email + no experience/anyone can apply + direct selection + hurry urgency",
+    description:
+      "High stipend (₹75k) + Yahoo email + no experience/anyone can apply + direct selection + hurry urgency",
     expectedVerdict: "Likely Fake",
     message: `Hi! Amazing opportunity for freshers. Work from home as a Social Media Executive Intern and earn Rs 75,000 per month! No experience required. Anyone can apply. Direct selection — shortlisted directly from your profile. Contact: jobs2024@yahoo.com. Hurry up, slots are filling fast!`,
   },
   {
     id: "scam-4",
     category: "Obvious Scam",
-    description: "Joining fee + security deposit + PAN card + bank account + IFSC before offer",
+    description:
+      "Joining fee + security deposit + PAN card + bank account + IFSC before offer",
     expectedVerdict: "Likely Fake",
     message: `You have been selected for a remote internship position. To confirm your enrollment, a joining fee of ₹1,000 is required as a refundable security deposit. Before your first day, please share your PAN card details and bank account number with IFSC code for payroll registration.`,
   },
   {
     id: "scam-5",
     category: "Obvious Scam",
-    description: "Copy-paste job + enrollment fee Rs 299 + URGENT HIRING + offer expires today",
+    description:
+      "Copy-paste job + enrollment fee Rs 299 + URGENT HIRING + offer expires today",
     expectedVerdict: "Likely Fake",
     message: `URGENT HIRING! Copy paste job available, work from home. No skills required. Earn Rs 500 per hour. Offer expires today. Start by paying a small enrollment fee of Rs 299 to receive your task kit. Contact us on WhatsApp only.`,
   },
@@ -58,7 +63,8 @@ export const TEST_CASES = [
   {
     id: "genuine-1",
     category: "Genuine",
-    description: "Formal Infosys offer letter — company domain email, Zoom interview, ₹15k stipend",
+    description:
+      "Formal Infosys offer letter — company domain email, Zoom interview, ₹15k stipend",
     expectedVerdict: "No Red Flags Found",
     message: `Dear Applicant,
 
@@ -79,7 +85,8 @@ Talent Acquisition Team, Infosys Technologies Ltd`,
   {
     id: "genuine-2",
     category: "Genuine",
-    description: "Small startup Pixel Studio — company domain, 2-round interview, ₹12k stipend, specific role, no rush",
+    description:
+      "Small startup Pixel Studio — company domain, 2-round interview, ₹12k stipend, specific role, no rush",
     expectedVerdict: "No Red Flags Found",
     message: `Hi Priya,
 
@@ -96,7 +103,8 @@ Please reply by September 10 if interested. No rush, we just want to close this 
   {
     id: "genuine-3",
     category: "Genuine",
-    description: "EduSpark EdTech — company email, cleared 2-round selection, ₹8k stipend, specific deliverables, no fees",
+    description:
+      "EduSpark EdTech — company email, cleared 2-round selection, ₹8k stipend, specific deliverables, no fees",
     expectedVerdict: "No Red Flags Found",
     message: `Subject: Internship Offer — Content Research Intern | EduSpark Learning
 
@@ -115,7 +123,8 @@ Contact: careers@eduspark.in`,
   {
     id: "genuine-4",
     category: "Genuine",
-    description: "FinEdge Capital — interview already done, company email, ₹20k stipend, hybrid role, formal offer letter",
+    description:
+      "FinEdge Capital — interview already done, company email, ₹20k stipend, hybrid role, formal offer letter",
     expectedVerdict: "No Red Flags Found",
     message: `Hi Rahul,
 
@@ -134,7 +143,8 @@ Shreya Mehta — HR Manager, FinEdge Capital Pvt Ltd`,
   {
     id: "genuine-5",
     category: "Genuine",
-    description: "GreenRoots NGO — org domain email, unpaid volunteer with certificate, onboarding call scheduled",
+    description:
+      "GreenRoots NGO — org domain email, unpaid volunteer with certificate, onboarding call scheduled",
     expectedVerdict: "No Red Flags Found",
     message: `Dear Applicant,
 
@@ -156,7 +166,8 @@ Meera Sharma — Programme Coordinator, GreenRoots Foundation`,
   {
     id: "border-1",
     category: "Borderline",
-    description: "Genuinely hedged payment hint ('a nominal admin charge *may* apply') — vague enough that the payment rule should NOT fire. But Gmail + vague WFH → 2 flags → Suspicious. Tests that the scanner doesn't over-flag truly ambiguous hints.",
+    description:
+      "Genuinely hedged payment hint ('a nominal admin charge *may* apply') — vague enough that the payment rule should NOT fire. But Gmail + vague WFH → 2 flags → Suspicious. Tests that the scanner doesn't over-flag truly ambiguous hints.",
     expectedVerdict: "Suspicious",
     message: `Hi! You've been shortlisted for our Digital Marketing Intern role at BrightMark Agency. This is a work-from-home opportunity — no experience required. Our team will train you from scratch. Stipend: Rs. 10,000/month, flexible hours. Note: a nominal admin charge may apply for certain onboarding formalities, handled through our third-party HR partner — details shared after selection. Reach out at hr.brightmark2024@gmail.com to get started!`,
   },
@@ -164,7 +175,8 @@ Meera Sharma — Programme Coordinator, GreenRoots Foundation`,
   {
     id: "border-2",
     category: "Borderline",
-    description: "Legitimate startup with tight but contextually explained deadline, unusual domain, specific role — should pass as Genuine",
+    description:
+      "Legitimate startup with tight but contextually explained deadline, unusual domain, specific role — should pass as Genuine",
     expectedVerdict: "No Red Flags Found",
     message: `Hey! Thanks for applying to Zap Logistics.
 
@@ -180,7 +192,8 @@ Interview: 20-minute call on Google Meet — please share your availability.
   {
     id: "border-3",
     category: "Borderline",
-    description: "Scam with indirect wording — 'refundable deposit' hidden in verification language + hotmail + 'Apply now' urgency",
+    description:
+      "Scam with indirect wording — 'refundable deposit' hidden in verification language + hotmail + 'Apply now' urgency",
     expectedVerdict: "Likely Fake",
     message: `We are running a Campus Ambassador Program! Selected students will represent top brands at their college and earn monthly incentives of ₹3,000–₹8,000. This is a work from home opportunity, just 2–3 hours a day. No skills needed.
 
@@ -191,7 +204,8 @@ Apply now — limited time offer! Contact: campus.program@hotmail.com`,
   {
     id: "border-4",
     category: "Borderline",
-    description: "Legitimate but non-native phrasing ('urgent requirement', 'as soon as possible') — should NOT falsely trigger urgency rule",
+    description:
+      "Legitimate but non-native phrasing ('urgent requirement', 'as soon as possible') — should NOT falsely trigger urgency rule",
     expectedVerdict: "No Red Flags Found",
     message: `Dear Student,
 
@@ -207,7 +221,8 @@ HR Department, TechMinds Solutions`,
   {
     id: "border-5",
     category: "Borderline",
-    description: "Polished scam — no payment, no personal email, no urgency, but 'No interview required' + 'No experience required' + WhatsApp only contact",
+    description:
+      "Polished scam — no payment, no personal email, no urgency, but 'No interview required' + 'No experience required' + WhatsApp only contact",
     expectedVerdict: "Suspicious",
     message: `Hi,
 

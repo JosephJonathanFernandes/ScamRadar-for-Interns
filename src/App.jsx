@@ -3,8 +3,8 @@ import CheckerForm from "./components/CheckerForm";
 import ResultCard from "./components/ResultCard";
 import RedFlagsGuide from "./components/RedFlagsGuide";
 import TestSuitePage from "./components/TestSuitePage";
-import { analyzeMessage } from "./scanner";
-import { checkCompany } from "./companyCheck";
+import { analyzeMessage } from "./core/scanner.js";
+import { checkCompany } from "./core/companyCheck.js";
 
 export default function App() {
   const [result, setResult] = useState(null);
@@ -32,7 +32,10 @@ export default function App() {
     }
 
     // Call LLM strictly as a fallback for ambiguous cases
-    if (analysis.verdict === "Suspicious" || analysis.verdict === "No Red Flags Found") {
+    if (
+      analysis.verdict === "Suspicious" ||
+      analysis.verdict === "No Red Flags Found"
+    ) {
       try {
         const response = await fetch("/api/llm-check", {
           method: "POST",
@@ -63,10 +66,14 @@ export default function App() {
         <header className="app-header">
           <div className="header-inner">
             <div className="logo-row">
-              <span className="logo-shield" aria-hidden="true">🛡️</span>
+              <span className="logo-shield" aria-hidden="true">
+                🛡️
+              </span>
               <div>
                 <h1 className="app-title">ScamRadar for Interns</h1>
-                <p className="app-tagline">Is that internship offer real — or a scam?</p>
+                <p className="app-tagline">
+                  Is that internship offer real — or a scam?
+                </p>
               </div>
             </div>
             <div className="header-badge">
@@ -80,8 +87,14 @@ export default function App() {
           </div>
         </main>
         <footer className="app-footer">
-          <p>ScamRadar for Interns is a free, open tool for students. Results are rule-based estimates — always verify independently.</p>
-          <p className="footer-disclaimer">Privacy first. Ambiguous messages may be sent to an AI for secondary analysis, but no data is permanently stored or logged.</p>
+          <p>
+            ScamRadar for Interns is a free, open tool for students. Results are
+            rule-based estimates — always verify independently.
+          </p>
+          <p className="footer-disclaimer">
+            Privacy first. Ambiguous messages may be sent to an AI for secondary
+            analysis, but no data is permanently stored or logged.
+          </p>
         </footer>
       </div>
     );
@@ -94,10 +107,14 @@ export default function App() {
       <header className="app-header">
         <div className="header-inner">
           <div className="logo-row">
-            <span className="logo-shield" aria-hidden="true">🛡️</span>
+            <span className="logo-shield" aria-hidden="true">
+              🛡️
+            </span>
             <div>
               <h1 className="app-title">ScamRadar for Interns</h1>
-              <p className="app-tagline">Is that internship offer real — or a scam?</p>
+              <p className="app-tagline">
+                Is that internship offer real — or a scam?
+              </p>
             </div>
           </div>
           <div className="header-right">
@@ -120,24 +137,32 @@ export default function App() {
       {/* ── Main ── */}
       <main className="app-main">
         <div className="content-container">
-
           {/* ── Checker Card ── */}
           <div className="checker-card">
             {isAnalyzing ? (
               <div className="analyzing-state" role="status" aria-live="polite">
                 <div className="analyzing-spinner" aria-hidden="true" />
-                <p className="analyzing-label">Verifying company information…</p>
-                <p className="analyzing-sub">Checking online presence · usually under 2 seconds</p>
+                <p className="analyzing-label">
+                  Verifying company information…
+                </p>
+                <p className="analyzing-sub">
+                  Checking online presence · usually under 2 seconds
+                </p>
               </div>
             ) : result ? (
-              <ResultCard result={result} llmResult={llmResult} onReset={handleReset} />
+              <ResultCard
+                result={result}
+                llmResult={llmResult}
+                onReset={handleReset}
+              />
             ) : (
               <>
                 <div className="checker-intro">
                   <h2>Check an Internship Message</h2>
                   <p>
-                    Got a message from an unknown company? Paste it below (or upload
-                    a screenshot) and we'll scan it for common scam patterns instantly.
+                    Got a message from an unknown company? Paste it below (or
+                    upload a screenshot) and we'll scan it for common scam
+                    patterns instantly.
                   </p>
                 </div>
                 <CheckerForm onAnalyze={handleAnalyze} />
@@ -151,13 +176,29 @@ export default function App() {
               <h2>How it works</h2>
               <div className="steps-row">
                 {[
-                  { n: "1", icon: "📋", label: "Paste message or upload screenshot" },
-                  { n: "2", icon: "🔍", label: "We scan for 9 red-flag categories" },
-                  { n: "3", icon: "📊", label: "Instant verdict with specific reasons" },
+                  {
+                    n: "1",
+                    icon: "📋",
+                    label: "Paste message or upload screenshot",
+                  },
+                  {
+                    n: "2",
+                    icon: "🔍",
+                    label: "We scan for 9 red-flag categories",
+                  },
+                  {
+                    n: "3",
+                    icon: "📊",
+                    label: "Instant verdict with specific reasons",
+                  },
                 ].map((s) => (
                   <div className="step" key={s.n}>
-                    <div className="step-num" aria-hidden="true">{s.n}</div>
-                    <div className="step-icon" aria-hidden="true">{s.icon}</div>
+                    <div className="step-num" aria-hidden="true">
+                      {s.n}
+                    </div>
+                    <div className="step-icon" aria-hidden="true">
+                      {s.icon}
+                    </div>
                     <p>{s.label}</p>
                   </div>
                 ))}
@@ -173,11 +214,12 @@ export default function App() {
       {/* ── Footer ── */}
       <footer className="app-footer">
         <p>
-          ScamRadar for Interns is a free, open tool for students. Results are rule-based
-          estimates — always verify independently.
+          ScamRadar for Interns is a free, open tool for students. Results are
+          rule-based estimates — always verify independently.
         </p>
         <p className="footer-disclaimer">
-          Privacy first. Ambiguous messages may be sent to an AI for secondary analysis, but no data is permanently stored or logged.
+          Privacy first. Ambiguous messages may be sent to an AI for secondary
+          analysis, but no data is permanently stored or logged.
         </p>
       </footer>
     </div>

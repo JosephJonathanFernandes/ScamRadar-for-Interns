@@ -19,7 +19,7 @@ const flags = [
   {
     icon: "🚫",
     title: "No Real Interview",
-    body: "\"Direct selection\", \"WhatsApp interview only\", or \"no interview required\" means there\'s no vetting process — a hallmark of fake offers.",
+    body: '"Direct selection", "WhatsApp interview only", or "no interview required" means there\'s no vetting process — a hallmark of fake offers.',
   },
   {
     icon: "📋",

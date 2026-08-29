@@ -1,16 +1,17 @@
 import React, { useState, useCallback } from "react";
-import { TEST_CASES } from "../testCases";
-import { analyzeMessage } from "../scanner";
+import { TEST_CASES } from "../../tests/fixtures/validationData.js";
+import { analyzeMessage } from "../core/scanner.js";
+import { checkCompany } from "../core/companyCheck.js";
 
 const CATEGORY_COLORS = {
   "Obvious Scam": "cat-scam",
-  "Genuine": "cat-genuine",
-  "Borderline": "cat-borderline",
+  Genuine: "cat-genuine",
+  Borderline: "cat-borderline",
 };
 
 const VERDICT_SHORT = {
   "Likely Fake": { cls: "v-fake", icon: "🚨" },
-  "Suspicious": { cls: "v-suspicious", icon: "⚠️" },
+  Suspicious: { cls: "v-suspicious", icon: "⚠️" },
   "No Red Flags Found": { cls: "v-genuine", icon: "✅" },
 };
 
@@ -54,13 +55,18 @@ export default function TestSuitePage({ onBack }) {
       {/* ── Header ── */}
       <div className="test-suite-header">
         <div className="test-suite-title-row">
-          <button className="btn-back-to-app" onClick={onBack} aria-label="Back to main app">
+          <button
+            className="btn-back-to-app"
+            onClick={onBack}
+            aria-label="Back to main app"
+          >
             ← Back
           </button>
           <div>
             <h2 className="test-suite-title">🧪 Rule Engine Test Suite</h2>
             <p className="test-suite-subtitle">
-              {total} test cases · validates the 7 core scanner rules · no company-check flags
+              {total} test cases · validates the 7 core scanner rules · no
+              company-check flags
             </p>
           </div>
         </div>
@@ -72,7 +78,9 @@ export default function TestSuitePage({ onBack }) {
           id="run-tests-btn"
         >
           {running ? (
-            <><span className="btn-spinner" aria-hidden="true" /> Running…</>
+            <>
+              <span className="btn-spinner" aria-hidden="true" /> Running…
+            </>
           ) : (
             <>{results ? "↺ Re-run All Tests" : "▶ Run All 15 Tests"}</>
           )}
@@ -81,18 +89,25 @@ export default function TestSuitePage({ onBack }) {
 
       {/* ── Summary Banner ── */}
       {results && (
-        <div className={`test-summary ${passed === total ? "test-summary--pass" : passed >= total * 0.8 ? "test-summary--warn" : "test-summary--fail"}`}>
+        <div
+          className={`test-summary ${passed === total ? "test-summary--pass" : passed >= total * 0.8 ? "test-summary--warn" : "test-summary--fail"}`}
+        >
           <div className="test-summary-score">
             <span className="test-summary-num">{passed}</span>
             <span className="test-summary-denom">/ {total}</span>
           </div>
           <div className="test-summary-text">
-            <strong>{passed === total ? "All tests passed! ✅" : `${passed} of ${total} tests passed`}</strong>
+            <strong>
+              {passed === total
+                ? "All tests passed! ✅"
+                : `${passed} of ${total} tests passed`}
+            </strong>
             <span className="test-summary-rate">{passRate}% pass rate</span>
           </div>
           {passed < total && (
             <p className="test-summary-hint">
-              Failing borderline cases may indicate rule gaps or intentional scanner blind-spots (see descriptions).
+              Failing borderline cases may indicate rule gaps or intentional
+              scanner blind-spots (see descriptions).
             </p>
           )}
         </div>
@@ -103,15 +118,22 @@ export default function TestSuitePage({ onBack }) {
         <div className="test-legend">
           <div className="legend-item">
             <span className="legend-dot legend-dot--scam" />
-            <span>5 Obvious Scams — all rules should fire, verdict: Likely Fake</span>
+            <span>
+              5 Obvious Scams — all rules should fire, verdict: Likely Fake
+            </span>
           </div>
           <div className="legend-item">
             <span className="legend-dot legend-dot--genuine" />
-            <span>5 Genuine Messages — no rules should fire, verdict: Likely Genuine</span>
+            <span>
+              5 Genuine Messages — no rules should fire, verdict: Likely Genuine
+            </span>
           </div>
           <div className="legend-item">
             <span className="legend-dot legend-dot--borderline" />
-            <span>5 Borderline Cases — indirect language, non-native phrasing, subtle gaps</span>
+            <span>
+              5 Borderline Cases — indirect language, non-native phrasing,
+              subtle gaps
+            </span>
           </div>
         </div>
       )}
@@ -139,7 +161,9 @@ export default function TestSuitePage({ onBack }) {
                 >
                   <td className="test-cell-num">{i + 1}</td>
                   <td>
-                    <span className={`test-cat-badge ${CATEGORY_COLORS[r.category]}`}>
+                    <span
+                      className={`test-cat-badge ${CATEGORY_COLORS[r.category]}`}
+                    >
                       {r.category}
                     </span>
                   </td>
@@ -151,12 +175,17 @@ export default function TestSuitePage({ onBack }) {
                     </details>
                   </td>
                   <td>
-                    <span className={`test-verdict ${VERDICT_SHORT[r.expectedVerdict]?.cls}`}>
-                      {VERDICT_SHORT[r.expectedVerdict]?.icon} {r.expectedVerdict}
+                    <span
+                      className={`test-verdict ${VERDICT_SHORT[r.expectedVerdict]?.cls}`}
+                    >
+                      {VERDICT_SHORT[r.expectedVerdict]?.icon}{" "}
+                      {r.expectedVerdict}
                     </span>
                   </td>
                   <td>
-                    <span className={`test-verdict ${VERDICT_SHORT[r.actualVerdict]?.cls}`}>
+                    <span
+                      className={`test-verdict ${VERDICT_SHORT[r.actualVerdict]?.cls}`}
+                    >
                       {VERDICT_SHORT[r.actualVerdict]?.icon} {r.actualVerdict}
                     </span>
                   </td>
@@ -174,7 +203,9 @@ export default function TestSuitePage({ onBack }) {
                     )}
                   </td>
                   <td className="test-cell-result">
-                    <span className={`test-result-badge ${r.pass ? "test-badge--pass" : "test-badge--fail"}`}>
+                    <span
+                      className={`test-result-badge ${r.pass ? "test-badge--pass" : "test-badge--fail"}`}
+                    >
                       {r.pass ? "✓ Pass" : "✗ Fail"}
                     </span>
                   </td>
@@ -188,9 +219,10 @@ export default function TestSuitePage({ onBack }) {
       {/* ── Note about company check ── */}
       <div className="test-suite-note">
         <p>
-          <strong>Note:</strong> This suite validates the 7 original rule-based flags only.
-          The company verification layer (domain mismatch, web presence) is async and must
-          be verified manually — paste a message with a known company name via the main UI.
+          <strong>Note:</strong> This suite validates the 7 original rule-based
+          flags only. The company verification layer (domain mismatch, web
+          presence) is async and must be verified manually — paste a message
+          with a known company name via the main UI.
         </p>
       </div>
     </div>

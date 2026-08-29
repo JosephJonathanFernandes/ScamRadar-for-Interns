@@ -89,23 +89,26 @@ Output:
     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
     try {
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "openai/gpt-oss-20b",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: `Message to analyze: "${message}"` }
-          ],
-          response_format: { type: "json_object" },
-          temperature: 0.1,
-        }),
-        signal: controller.signal,
-      });
+      const response = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-oss-20b",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: `Message to analyze: "${message}"` },
+            ],
+            response_format: { type: "json_object" },
+            temperature: 0.1,
+          }),
+          signal: controller.signal,
+        }
+      );
 
       clearTimeout(timeoutId);
 
@@ -134,7 +137,7 @@ Output:
   // Try each key in sequence
   for (let i = 0; i < keys.length; i++) {
     const result = await callGroq(keys[i]);
-    
+
     if (result.status === 200) {
       try {
         const content = result.data.choices[0].message.content;
@@ -145,7 +148,9 @@ Output:
         return res.status(200).json({ llmAvailable: false });
       }
     } else if (result.status === 429 || result.status === 401) {
-      console.warn(`Key ${i + 1} failed (${result.status}). Trying next key...`);
+      console.warn(
+        `Key ${i + 1} failed (${result.status}). Trying next key...`
+      );
       continue; // Try next key
     } else {
       // 500 or timeout — fail gracefully, no need to burn other keys if API is down

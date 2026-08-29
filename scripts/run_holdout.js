@@ -1,10 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
-import { checkCompany } from "../src/companyCheck.js";
-import { analyzeMessage } from "../src/scanner.js";
+import { checkCompany } from "../src/core/companyCheck.js";
+import { analyzeMessage } from "../src/core/scanner.js";
 
 async function runHoldout() {
-  const dataPath = path.resolve("./src/holdoutData.json");
+  const dataPath = path.resolve("./tests/fixtures/holdoutData.json");
   
   const fileContent = await fs.readFile(dataPath, "utf-8");
   const dataset = JSON.parse(fileContent);

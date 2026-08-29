@@ -1,0 +1,213 @@
+[
+  {
+    "id": "scam_axis_data_entry",
+    "type": "scam",
+    "source": "external_real",
+    "description": "Real-world data entry scam asking for Rs 500 security deposit.",
+    "text": "🔴 URGENT HIRING ALERT 🔴\n\nDear Candidate,\nWe are happy to inform you that your profile has been shortlisted for the post of Data Entry Operator / Work From Home Executive at AXIS Digital Services Pvt. Ltd.\n\n✅ Work From Home (100% Remote)\n✅ No Target, No Pressure\n✅ Daily/Weekly Payment\n✅ Part Time / Full Time Available\n\nSalary: Rs. 15,000 to Rs. 45,000 per month\n\nTo confirm your seat, you need to register by paying a one-time refundable security deposit of Rs. 500/-\n\nAfter payment, you will receive:\n- Login ID & Password\n- Training Material\n- Task Sheet\n\nContact on WhatsApp: +91-XXXXXXXXXX\nLast date to apply: Today Only\n\nNote: Seats are very limited. First come, first serve basis."
+  },
+  {
+    "id": "scam_techera_identity",
+    "type": "scam",
+    "source": "external_real",
+    "description": "Real-world identity harvesting scam.",
+    "text": "Hello,\n\nThis is to inform you that your resume was reviewed and you've been selected for an Online Internship opportunity with our company TechEra Solutions.\n\nProfile: Social Media Intern\nDuration: 2 Months\nStipend: Rs. 8,000/Month\nWork: Online (Work from Home)\n\nTo proceed further, kindly share the following details on WhatsApp:\n1. Full Name\n2. Date of Birth  \n3. Aadhar Card Number\n4. Bank Account Number & IFSC Code\n5. Passport Size Photo\n\nNo interview will be conducted. You are directly selected based on your profile.\nJoining date: Immediate\n\nRespond within 24 hours or your slot will be given to the next candidate.\n\nRegards,\nHR Team\nTechEra Solutions\ncontact.techerasolutions@gmail.com"
+  },
+  {
+    "id": "scam_amazon_spoof",
+    "type": "scam",
+    "source": "proxy_authored",
+    "description": "Spoofed Amazon recruitment with typosquatting domain.",
+    "text": "Congratulations! You have been selected for a remote Software Engineering Internship at Amazon.\n\nStipend: Rs 60,000/month.\nWork hours are flexible. Just 2 hours a day from home.\n\nPlease complete your onboarding by paying the refundable laptop dispatch fee of ₹2000.\n\nContact your manager at hr@amazon-careers-india.com to process the payment immediately."
+  },
+  {
+    "id": "scam_hotel_rating",
+    "type": "scam",
+    "source": "proxy_authored",
+    "description": "Task-based rating scam.",
+    "text": "Hi, I am from Marriott Hotels HR. We are offering a part-time job you can do from your mobile. \nYour task is simply to rate our hotels 5 stars on Google Maps. \nYou can earn ₹2000 - ₹5000 daily. \n\nNo experience needed. Anyone can apply. \nMessage 'INTERESTED' to start earning today!"
+  },
+  {
+    "id": "scam_youtube_likes",
+    "type": "scam",
+    "source": "proxy_authored",
+    "description": "Task-based YouTube like scam.",
+    "text": "Earn money easily from home! We need interns to like and subscribe to YouTube channels of our clients. \nPart-time work online. \nSalary: ₹100 per like. Potential to earn up to 1 lakh per month! \n\nNo interview required. Directly message our executive on Telegram to join the task group."
+  },
+  {
+    "id": "scam_generic_wfh",
+    "type": "scam",
+    "source": "proxy_authored",
+    "description": "Generic easy work from home.",
+    "text": "WORK FROM HOME OPPORTUNITY 2024!!\nNeed students for simple copy and paste work.\nEarn Rs. 30,000 per month.\nAge: 18+\nEducation: 10th pass.\n\nOnly 5 seats left. Hurry up and send your Aadhaar card details to apply."
+  },
+  {
+    "id": "scam_infosys_fake",
+    "type": "scam",
+    "source": "proxy_authored",
+    "description": "Infosys fake domain scam.",
+    "text": "Greetings!\n\nWe are pleased to offer you an internship at Infosys Technologies Ltd. You have been selected for our Software Development Intern program for the October 2024 batch.\n\nStipend: Rs. 15,000 per month | Duration: 3 months | Mode: Remote\n\nPlease contact our HR team for next steps: hr@infosys-careers-india.com"
+  },
+  {
+    "id": "scam_tcs_training_fee",
+    "type": "scam",
+    "source": "proxy_authored",
+    "description": "TCS fake domain with training fee.",
+    "text": "Dear Student, you are shortlisted for TCS internship.\nRole: Java Developer Intern.\nWe will provide a 1-month training kit for which a nominal processing charge of Rs. 999 applies. This is refundable after the 1st month.\n\nEmail us your confirmation today at campus@tcshiringportal.net"
+  },
+  {
+    "id": "scam_marketing_agency",
+    "type": "scam",
+    "source": "proxy_authored",
+    "description": "Marketing agency scam using Gmail and direct selection.",
+    "text": "Looking for Digital Marketing Interns for remote work. \nStipend: ₹40,000/month.\nDirect selection based on profile. No interview. \n\nEmail your resume to digitalmarketing.agency2024@gmail.com. Offer expires today!"
+  },
+  {
+    "id": "scam_app_testing",
+    "type": "scam",
+    "source": "proxy_authored",
+    "description": "App testing scam with upfront fee.",
+    "text": "Internship Alert: App Tester required.\nTest new Android apps and give feedback. \nStipend: Rs 500 per app tested.\n\nPay a one time registration fee of ₹150 to get the app testing portal login. \nContact quickly before slots are filling."
+  },
+  {
+    "id": "scam_hr_recruiter",
+    "type": "scam",
+    "source": "proxy_authored",
+    "description": "HR recruiter scam.",
+    "text": "Hi, I am an HR recruiter from a top MNC. \nWe have 100% remote job openings for college students. \nEarn Rs 50,000 per month. \nSend your PAN card and Bank details to process the offer letter. \nReply immediately."
+  },
+  {
+    "id": "scam_certificate_fee",
+    "type": "scam",
+    "source": "proxy_authored",
+    "description": "Certificate fee scam.",
+    "text": "Congratulations on completing your assessment for the AI Internship. \nTo release your offer letter and generate your internship ID card, please pay the certificate processing fee of Rs. 299. \nThis fee goes to our third-party vendor. \n\nPlease respond within 24 hours."
+  },
+  {
+    "id": "scam_data_science",
+    "type": "scam",
+    "source": "proxy_authored",
+    "description": "Data science scam with fake domain.",
+    "text": "You are selected for Data Science Internship at Wipro.\nStipend: 45k/month. Work from home.\n\nKindly send ₹500 as a refundable deposit for the company laptop.\nEmail us at hr@wipro-jobs.com"
+  },
+  {
+    "id": "scam_typing_job",
+    "type": "scam",
+    "source": "proxy_authored",
+    "description": "Typing job scam.",
+    "text": "Offline/Online Typing Job.\nType 50 pages and earn Rs. 5000 weekly.\nRegistration fee: ₹499.\n\nContact via WhatsApp. Immediate joining."
+  },
+  {
+    "id": "scam_overseas",
+    "type": "scam",
+    "source": "proxy_authored",
+    "description": "Overseas placement scam.",
+    "text": "International Internship Opportunity in Singapore!\nCompany: Global Tech Solutions.\nAll travel and visa sponsored.\nJust pay the Rs 2500 visa processing fee directly to our agent.\n\nOnly 2 seats left. First come first serve."
+  },
+
+  {
+    "id": "gen_startup_informal",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "Informal startup offer using Gmail and tight deadline.",
+    "text": "Hey Rohan, thanks for the chat today! We'd love to offer you the Frontend Developer Internship at PixelCrafters. \nStipend will be Rs. 15,000/month. It's a remote role. \nSince we're a small team, we operate fast. Please let me know if you accept by tomorrow EOD so we can plan next week's sprint. \n\nBest, \nAman (Founder)\npixelcrafters.tech@gmail.com"
+  },
+  {
+    "id": "gen_tpo_forward",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "Messy TPO forward with urgent deadline.",
+    "text": "*URGENT PLACEMENT UPDATE*\n\nInfosys has opened an off-campus internship drive for 2025 batch.\nRole: Systems Engineer Intern\nStipend: ₹25,000/month.\n\nAll interested students must fill the Google Form below by 5 PM TODAY. Do not miss this deadline as the link will close automatically. \n\nForm link: https://forms.gle/xyz"
+  },
+  {
+    "id": "gen_unpaid_ngo",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "Legitimate unpaid NGO internship.",
+    "text": "Dear Student,\n\nThank you for applying to Teach For India's summer volunteer internship. We are pleased to select you for the role of Content Creator Intern.\n\nPlease note this is an unpaid internship aimed at social impact. You will receive a certificate upon completion. \n\nPlease reply to this email to confirm your acceptance."
+  },
+  {
+    "id": "gen_take_home_task",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "Legitimate take-home task before offer.",
+    "text": "Hi Priya,\n\nYour resume has been shortlisted for the Graphic Design Internship at Zomato. \nAs the next step in our interview process, we require candidates to complete a small design assignment. \n\nPlease design a sample Instagram post for a new coffee brand. Submit your task within 48 hours to design-hiring@zomato.com. \n\nRegards,\nZomato HR"
+  },
+  {
+    "id": "gen_high_stipend_mnc",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "High stipend but legitimate MNC offer.",
+    "text": "Dear Candidate,\n\nWe are thrilled to offer you the SWE Summer Internship at Google India. \nYour monthly stipend will be Rs. 1,10,000.\n\nPlease log into the candidate portal to accept your offer and complete the background verification process within 3 days. \n\nWelcome to Google!"
+  },
+  {
+    "id": "gen_startup_whatsapp",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "Legitimate startup communicating purely on WhatsApp.",
+    "text": "Hi Arun, following up on our Google Meet interview yesterday. The team loved your portfolio. We are offering you the UI/UX internship at Rs 12k/month. \nCan you send over your PAN card and bank details here so I can get the offer letter generated? \n- Sneha, HR @ FinEdge"
+  },
+  {
+    "id": "gen_research_intern",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "Research internship at a university.",
+    "text": "Dear Applicant,\n\nYou have been selected for the Summer Research Fellowship at IIT Bombay under Prof. Sharma.\nStipend: ₹10,000 per month provided by SERB.\n\nPlease send your acceptance along with a scanned copy of your college ID card by Friday."
+  },
+  {
+    "id": "gen_local_agency",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "Local agency with generic job description.",
+    "text": "We are hiring interns! \nRole: Social Media Executive\nWork: Handle Instagram accounts, reply to DMs, basic Canva design. \nStipend: Rs 5,000/month. \n\nWalk-in interviews tomorrow at our office in Koramangala. \nContact: hello@creativemonkeys.in"
+  },
+  {
+    "id": "gen_campus_ambassador",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "Campus ambassador role, unpaid, performance based.",
+    "text": "Selected for Red Bull Campus Ambassador Program!\n\nHi there, welcome to the team! This is a performance-based role where you get exclusive merch and event access based on the campaigns you run in your college.\n\nJoin the WhatsApp group link below to meet your regional manager."
+  },
+  {
+    "id": "gen_tpo_direct_selection",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "TPO direct selection based on CGPA.",
+    "text": "Notice: Direct Selection for L&T Edutech Internship.\n\nThe following students with CGPA > 8.5 have been directly shortlisted by the company for the 6-month internship based on their academic profile. No further technical interview will be held. \n\nReport to the TPO office tomorrow at 10 AM with your original marksheets."
+  },
+  {
+    "id": "gen_wfh_content",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "Genuine WFH content writing.",
+    "text": "Hi, we are offering a 3-month Content Writing Internship at Pepper Content. \nThis is a 100% remote work-from-home role. \nStipend: Rs 8,000/month. \n\nPlease sign the attached NDA and offer letter and revert within 2 days."
+  },
+  {
+    "id": "gen_startup_no_experience",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "Startup explicitly saying no experience required for a basic role.",
+    "text": "Hiring: Data Operations Intern at Swiggy.\nNo prior experience required — we will train you on our internal dashboard tools. \nYou just need a laptop and good internet. \nStipend: Rs 10,000/month. \nApply on our careers page."
+  },
+  {
+    "id": "gen_tpo_immediate_joining",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "TPO message with immediate joining pressure.",
+    "text": "TCS Ninja Internship Results are out.\nSelected students must confirm their acceptance on the portal immediately. \nThe company requires immediate joining from next Monday. Failure to confirm today will result in the offer being passed to waitlisted candidates."
+  },
+  {
+    "id": "gen_informal_founder",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "Very informal message from a founder.",
+    "text": "Hey man, loved the github repo you shared. Do you want to intern with us at BuildSpace this summer? We can do ₹20k a month. Let me know ASAP so I can send the paperwork."
+  },
+  {
+    "id": "gen_govt_internship",
+    "type": "genuine",
+    "source": "proxy_authored",
+    "description": "Government internship with no interview but strict deadline.",
+    "text": "Selection Notice: NITI Aayog Internship Scheme.\n\nYou have been selected for the unpaid internship based on your application and statement of purpose. \nPlease submit your NOC from the college and police verification certificate within 5 days, failing which the offer stands cancelled."
+  }
+]

@@ -15,7 +15,7 @@ function vercelApiProxy() {
           req.on('end', async () => {
             try {
               req.body = JSON.parse(body);
-              const { default: handler } = await import('./api/llm-check.js');
+              const { default: handler } = await import('./src/api/llm-check.js');
               
               // Mock res.status().json() since Vercel adds these to standard Node.js ServerResponse
               res.status = (code) => {

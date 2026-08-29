@@ -38,14 +38,37 @@ const COMPANY_PATTERNS = [
   // "Company: TechCorp" / "Company Name: BrightMark"
   /company\s*(?:name)?\s*[:\-–]\s*([A-Z][a-zA-Z&]+(?:\s+[A-Z][a-zA-Z&]+)*)/i,
   // Capitalized word(s) + known suffix — last resort
-  new RegExp(`([A-Z][a-zA-Z&]+(?:\\s+[A-Z][a-zA-Z&]+)*)\\s+${CORP_SUFFIXES}\\b`),
+  new RegExp(
+    `([A-Z][a-zA-Z&]+(?:\\s+[A-Z][a-zA-Z&]+)*)\\s+${CORP_SUFFIXES}\\b`
+  ),
 ];
 
 const STOP_WORDS = new Set([
-  "Dear", "Hello", "Hi", "Congratulations", "You", "We", "Our", "The",
-  "This", "Your", "Please", "Regards", "Thanks", "Note", "Subject",
-  "Team", "HR", "Human", "Resources", "Management", "Department",
-  "Greetings", "Sir", "Madam", "Respected",
+  "Dear",
+  "Hello",
+  "Hi",
+  "Congratulations",
+  "You",
+  "We",
+  "Our",
+  "The",
+  "This",
+  "Your",
+  "Please",
+  "Regards",
+  "Thanks",
+  "Note",
+  "Subject",
+  "Team",
+  "HR",
+  "Human",
+  "Resources",
+  "Management",
+  "Department",
+  "Greetings",
+  "Sir",
+  "Madam",
+  "Respected",
 ]);
 
 /**
@@ -105,7 +128,8 @@ function normalizeStr(s) {
 
 /** Minimal Levenshtein distance (optimised for short strings ≤ 30 chars). */
 function levenshtein(a, b) {
-  const m = a.length, n = b.length;
+  const m = a.length,
+    n = b.length;
   // row-only DP
   let row = Array.from({ length: n + 1 }, (_, i) => i);
   for (let i = 1; i <= m; i++) {
@@ -114,9 +138,7 @@ function levenshtein(a, b) {
     for (let j = 1; j <= n; j++) {
       const temp = row[j];
       row[j] =
-        a[i - 1] === b[j - 1]
-          ? prev
-          : 1 + Math.min(row[j - 1], row[j], prev);
+        a[i - 1] === b[j - 1] ? prev : 1 + Math.min(row[j - 1], row[j], prev);
       prev = temp;
     }
   }
@@ -149,10 +171,26 @@ function domainSimilarToCompany(companyName, domain) {
 
   // Suspicious phishing-domain keywords — common in fake recruitment domains
   const PHISHING_KEYWORDS = [
-    "careers", "career", "jobs", "job", "hire", "hiring", "recruit",
-    "recruitment", "freshers", "fresher", "apply", "application",
-    "india", "official", "portal", "online", "campus", "internship",
-    "hrteam", "hrdept",
+    "careers",
+    "career",
+    "jobs",
+    "job",
+    "hire",
+    "hiring",
+    "recruit",
+    "recruitment",
+    "freshers",
+    "fresher",
+    "apply",
+    "application",
+    "india",
+    "official",
+    "portal",
+    "online",
+    "campus",
+    "internship",
+    "hrteam",
+    "hrdept",
   ];
 
   const hasSuspiciousSuffix = PHISHING_KEYWORDS.some((kw) =>
@@ -162,7 +200,8 @@ function domainSimilarToCompany(companyName, domain) {
   // Strategy 1: full name exact match in domain base (e.g. "infosys" domain for Infosys)
   // Only trust this if no suspicious extras are present
   if (!hasSuspiciousSuffix) {
-    if (domainBase.includes(fullNorm) || fullNorm.includes(domainBase)) return true;
+    if (domainBase.includes(fullNorm) || fullNorm.includes(domainBase))
+      return true;
   }
 
   // Strategy 2: per-token containment, BUT only if domain doesn't contain the
@@ -189,7 +228,6 @@ function domainSimilarToCompany(companyName, domain) {
 
   return false;
 }
-
 
 // ─── DuckDuckGo Web Presence Check ───────────────────────────────────────────
 

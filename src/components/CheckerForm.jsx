@@ -1,131 +1,8 @@
 import React, { useState, useRef, useCallback } from "react";
 import { createWorker } from "tesseract.js";
+import { preprocessImageForOCR, stripWhatsAppArtifacts } from "../core/ocr.js";
 
 const MAX_CHARS = 5000;
-
-// ─── Canvas Preprocessing ────────────────────────────────────────────────────
-
-/**
- * Converts an image File to a greyscale, contrast-boosted PNG Blob using the
- * Canvas API.  This improves Tesseract accuracy on WhatsApp screenshot
- * backgrounds (coloured chat bubbles, dark mode, compressed JPEGs).
- *
- * @param {File} file - Source image file
- * @returns {Promise<Blob>} - Preprocessed PNG blob ready for Tesseract
- */
-async function preprocessImageForOCR(file) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(file);
-
-    img.onload = () => {
-      URL.revokeObjectURL(objectUrl);
-      const canvas = document.createElement("canvas");
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
-
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const data = imageData.data;
-      const CONTRAST = 1.6; // contrast factor — 1.0 = unchanged
-
-      for (let i = 0; i < data.length; i += 4) {
-        // Luminance-weighted greyscale conversion
-        const gray = Math.round(
-          0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]
-        );
-        // Contrast boost: stretch around midpoint 128
-        const boosted = Math.min(
-          255,
-          Math.max(0, Math.round((gray - 128) * CONTRAST + 128))
-        );
-        data[i] = boosted;      // R
-        data[i + 1] = boosted;  // G
-        data[i + 2] = boosted;  // B
-        // Alpha (data[i+3]) unchanged
-      }
-
-      ctx.putImageData(imageData, 0, 0);
-      canvas.toBlob(
-        (blob) => (blob ? resolve(blob) : reject(new Error("toBlob() failed"))),
-        "image/png"
-      );
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      reject(new Error("Image failed to load"));
-    };
-    img.src = objectUrl;
-  });
-}
-
-// ─── WhatsApp Artifact Stripping ─────────────────────────────────────────────
-
-/**
- * Patterns that identify WhatsApp UI chrome — these lines should NOT be
- * fed into the scam scanner because they risk false positives
- * (e.g. "Forwarded" triggering a capitalized company-name extraction).
- */
-const WHATSAPP_ARTIFACT_PATTERNS = [
-  // Timestamps: "12:34 PM", "08:45 AM"
-  /^\s*\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?\s*$/,
-  // Date + timestamp in various formats
-  /^\s*\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4},?\s+\d{1,2}:\d{2}\s*(?:AM|PM)?\s*$/i,
-  // Square-bracket WhatsApp export format: "[08:45, 5/8/2024]"
-  /^\s*\[\d{1,2}:\d{2},?\s+\d{1,2}\/\d{1,2}\/\d{4}\]\s*.*$/,
-  // Day headers: "Yesterday", "Today", day names
-  /^\s*(?:yesterday|today|sunday|monday|tuesday|wednesday|thursday|friday|saturday)\s*$/i,
-  // Month + day + year lines: "August 29, 2024"
-  /^\s*(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+\d{1,2},?\s+\d{4}\s*$/i,
-  // "Forwarded" / "Forwarded many times" / "⟳ Forwarded"
-  /^\s*(?:⟳\s*)?forwarded(?:\s+many\s*times?)?\s*$/i,
-  // "This message was forwarded many times"
-  /^\s*this\s+message\s+was\s+forwarded/i,
-  // WhatsApp encryption notice
-  /^\s*messages?\s+(?:and\s+calls?\s+)?(?:are|is)\s+end[- ]to[- ]end\s+encrypted/i,
-  // "~Name" display name lines
-  /^\s*~[\w\s]+$/,
-  // "Read" / "Delivered" / "Seen" status lines
-  /^\s*(?:read|delivered|seen|sent)\s*$/i,
-];
-
-/**
- * Strips WhatsApp UI artifacts from raw OCR text.
- *
- * @param {string} rawText
- * @returns {{ cleanText: string, strippedLines: string[] }}
- */
-function stripWhatsAppArtifacts(rawText) {
-  const lines = rawText.split("\n");
-  const cleanLines = [];
-  const strippedLines = [];
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-
-    // Keep blank lines in clean output (they preserve paragraph structure)
-    if (!trimmed) {
-      cleanLines.push("");
-      continue;
-    }
-
-    const isArtifact = WHATSAPP_ARTIFACT_PATTERNS.some((p) => p.test(trimmed));
-    if (isArtifact) {
-      strippedLines.push(trimmed);
-    } else {
-      cleanLines.push(line);
-    }
-  }
-
-  // Collapse 3+ consecutive blank lines down to 2
-  const cleanText = cleanLines
-    .join("\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-
-  return { cleanText, strippedLines };
-}
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -144,7 +21,7 @@ export default function CheckerForm({ onAnalyze }) {
   const [imagePreview, setImagePreview] = useState(null);
   const [ocrStatus, setOcrStatus] = useState(null);
   const [ocrProgress, setOcrProgress] = useState(0);
-  const [ocrData, setOcrData] = useState(null);     // { cleanText, strippedLines }
+  const [ocrData, setOcrData] = useState(null); // { cleanText, strippedLines }
   const [ocrEditText, setOcrEditText] = useState(""); // editable version of cleanText
 
   const [isDragOver, setIsDragOver] = useState(false);
@@ -216,7 +93,10 @@ export default function CheckerForm({ onAnalyze }) {
     if (file) processImage(file);
   };
 
-  const handleDragOver = (e) => { e.preventDefault(); setIsDragOver(true); };
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
   const handleDragLeave = () => setIsDragOver(false);
 
   const handleClear = () => {
@@ -253,7 +133,6 @@ export default function CheckerForm({ onAnalyze }) {
 
   return (
     <div className="checker-form-wrap">
-
       {/* ══ PRIMARY: Direct Text Paste ══════════════════════════════════════ */}
       <form onSubmit={handleMainSubmit} noValidate>
         <div className="form-section">
@@ -274,7 +153,9 @@ export default function CheckerForm({ onAnalyze }) {
             <div className="textarea-footer">
               <span
                 id="char-count"
-                className={charCount > MAX_CHARS * 0.9 ? "char-count warn" : "char-count"}
+                className={
+                  charCount > MAX_CHARS * 0.9 ? "char-count warn" : "char-count"
+                }
               >
                 {charCount} / {MAX_CHARS}
               </span>
@@ -304,7 +185,9 @@ export default function CheckerForm({ onAnalyze }) {
       </form>
 
       {/* ── Divider ── */}
-      <div className="divider-or" aria-hidden="true"><span>or</span></div>
+      <div className="divider-or" aria-hidden="true">
+        <span>or</span>
+      </div>
 
       {/* ══ SECONDARY: Image Upload + OCR ══════════════════════════════════ */}
       <div className="form-section">
@@ -320,7 +203,9 @@ export default function CheckerForm({ onAnalyze }) {
           role="button"
           tabIndex={0}
           aria-label="Upload screenshot of internship message"
-          onKeyDown={(e) => e.key === "Enter" && !imagePreview && fileInputRef.current?.click()}
+          onKeyDown={(e) =>
+            e.key === "Enter" && !imagePreview && fileInputRef.current?.click()
+          }
         >
           <input
             ref={fileInputRef}
@@ -334,37 +219,59 @@ export default function CheckerForm({ onAnalyze }) {
 
           {!imagePreview ? (
             <div className="drop-zone-prompt">
-              <div className="drop-icon" aria-hidden="true">📷</div>
-              <p className="drop-text">Drop image here or <span className="drop-link">browse</span></p>
-              <p className="drop-hint">PNG, JPG, WEBP · Enhanced greyscale preprocessing before OCR</p>
+              <div className="drop-icon" aria-hidden="true">
+                📷
+              </div>
+              <p className="drop-text">
+                Drop image here or <span className="drop-link">browse</span>
+              </p>
+              <p className="drop-hint">
+                PNG, JPG, WEBP · Enhanced greyscale preprocessing before OCR
+              </p>
             </div>
           ) : (
             <div className="drop-zone-preview">
-              <img src={imagePreview} alt="Uploaded screenshot preview" className="preview-img" />
+              <img
+                src={imagePreview}
+                alt="Uploaded screenshot preview"
+                className="preview-img"
+              />
               <div className="preview-overlay">
                 {ocrStatus === "loading" && (
                   <div className="ocr-progress-wrap">
                     <div className="ocr-spinner" aria-hidden="true" />
                     <span>Preprocessing + reading text… {ocrProgress}%</span>
                     <div className="ocr-bar-track">
-                      <div className="ocr-bar-fill" style={{ width: `${ocrProgress}%` }} />
+                      <div
+                        className="ocr-bar-fill"
+                        style={{ width: `${ocrProgress}%` }}
+                      />
                     </div>
                   </div>
                 )}
                 {ocrStatus === "review" && (
-                  <div className="ocr-done">✅ Text extracted — review below before analyzing</div>
+                  <div className="ocr-done">
+                    ✅ Text extracted — review below before analyzing
+                  </div>
                 )}
-                {(ocrStatus === "done") && (
-                  <div className="ocr-done">✅ Text copied to text box above</div>
+                {ocrStatus === "done" && (
+                  <div className="ocr-done">
+                    ✅ Text copied to text box above
+                  </div>
                 )}
                 {ocrStatus === "error" && (
-                  <div className="ocr-error">❌ Could not read text. Please paste manually.</div>
+                  <div className="ocr-error">
+                    ❌ Could not read text. Please paste manually.
+                  </div>
                 )}
               </div>
               <button
                 type="button"
                 className="btn-remove-img"
-                onClick={(e) => { e.stopPropagation(); handleClear(); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClear();
+                }}
                 aria-label="Remove image"
               >
                 ✕
@@ -375,14 +282,22 @@ export default function CheckerForm({ onAnalyze }) {
 
         {/* ── OCR Review Panel (shown after successful OCR) ── */}
         {ocrStatus === "review" && ocrData && (
-          <div className="ocr-review-panel" role="region" aria-label="OCR text review">
+          <div
+            className="ocr-review-panel"
+            role="region"
+            aria-label="OCR text review"
+          >
             <div className="ocr-review-header">
-              <span className="ocr-review-icon" aria-hidden="true">✏️</span>
+              <span className="ocr-review-icon" aria-hidden="true">
+                ✏️
+              </span>
               <div>
-                <p className="ocr-review-title">Review extracted text before analyzing</p>
+                <p className="ocr-review-title">
+                  Review extracted text before analyzing
+                </p>
                 <p className="ocr-review-hint">
-                  OCR on compressed screenshots is imperfect — correct any obvious errors
-                  so the scanner reads the right content.
+                  OCR on compressed screenshots is imperfect — correct any
+                  obvious errors so the scanner reads the right content.
                 </p>
               </div>
             </div>
@@ -390,7 +305,9 @@ export default function CheckerForm({ onAnalyze }) {
             <textarea
               className="ocr-review-textarea"
               value={ocrEditText}
-              onChange={(e) => setOcrEditText(e.target.value.slice(0, MAX_CHARS))}
+              onChange={(e) =>
+                setOcrEditText(e.target.value.slice(0, MAX_CHARS))
+              }
               rows={8}
               aria-label="Extracted and editable OCR text"
               placeholder="Extracted text will appear here…"
@@ -401,8 +318,13 @@ export default function CheckerForm({ onAnalyze }) {
             {ocrData.strippedLines.length > 0 && (
               <details className="ocr-artifacts-details">
                 <summary className="ocr-artifacts-summary">
-                  🗑️ {ocrData.strippedLines.length} WhatsApp metadata line{ocrData.strippedLines.length > 1 ? "s" : ""} removed from analysis
-                  <span className="artifacts-expand-hint"> (click to view)</span>
+                  🗑️ {ocrData.strippedLines.length} WhatsApp metadata line
+                  {ocrData.strippedLines.length > 1 ? "s" : ""} removed from
+                  analysis
+                  <span className="artifacts-expand-hint">
+                    {" "}
+                    (click to view)
+                  </span>
                 </summary>
                 <ul className="ocr-artifacts-list">
                   {ocrData.strippedLines.map((line, i) => (
@@ -412,7 +334,8 @@ export default function CheckerForm({ onAnalyze }) {
                   ))}
                 </ul>
                 <p className="ocr-artifacts-note">
-                  These lines (timestamps, "Forwarded" labels, etc.) are excluded from scam detection to avoid noise.
+                  These lines (timestamps, "Forwarded" labels, etc.) are
+                  excluded from scam detection to avoid noise.
                 </p>
               </details>
             )}
@@ -426,7 +349,8 @@ export default function CheckerForm({ onAnalyze }) {
                 onClick={handleOcrAnalyze}
                 id="ocr-analyze-btn"
               >
-                <span aria-hidden="true">🔍</span> Looks good — Analyze this text
+                <span aria-hidden="true">🔍</span> Looks good — Analyze this
+                text
               </button>
               <button
                 type="button"

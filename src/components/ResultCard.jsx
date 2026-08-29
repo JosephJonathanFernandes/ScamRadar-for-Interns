@@ -32,7 +32,7 @@ const WEIGHT_LABEL = {
 const LLM_VERDICT_MAP = {
   genuine: "Appears Genuine (Still verify independently)",
   suspicious: "Suspicious",
-  fake: "Likely Fake"
+  fake: "Likely Fake",
 };
 
 export default function ResultCard({ result, llmResult, onReset }) {
@@ -42,7 +42,8 @@ export default function ResultCard({ result, llmResult, onReset }) {
   const cardRef = useRef(null);
 
   const didLlmRun = verdict !== "Likely Fake";
-  const hasConflictingLlm = llmResult && LLM_VERDICT_MAP[llmResult.verdict] !== verdict;
+  const hasConflictingLlm =
+    llmResult && LLM_VERDICT_MAP[llmResult.verdict] !== verdict;
 
   useEffect(() => {
     // Animate bar after mount
@@ -52,10 +53,17 @@ export default function ResultCard({ result, llmResult, onReset }) {
   }, [percentage]);
 
   return (
-    <div className={`result-card ${meta.className}`} ref={cardRef} role="region" aria-label="Analysis Result">
+    <div
+      className={`result-card ${meta.className}`}
+      ref={cardRef}
+      role="region"
+      aria-label="Analysis Result"
+    >
       {/* ── Verdict Badge ── */}
       <div className="verdict-header">
-        <span className="verdict-emoji" aria-hidden="true">{meta.emoji}</span>
+        <span className="verdict-emoji" aria-hidden="true">
+          {meta.emoji}
+        </span>
         <div className="verdict-text">
           <h2 className="verdict-title">{verdict}</h2>
           <p className="verdict-tagline">{meta.tagline}</p>
@@ -64,15 +72,25 @@ export default function ResultCard({ result, llmResult, onReset }) {
 
       <div className="verdict-disclaimer">
         {didLlmRun ? (
-          <>⚠️ For unclear cases, this message was analyzed by an AI model for a second opinion. Avoid pasting messages containing sensitive personal information. A clean result doesn't guarantee the offer is genuine.</>
+          <>
+            ⚠️ For unclear cases, this message was analyzed by an AI model for a
+            second opinion. Avoid pasting messages containing sensitive personal
+            information. A clean result doesn't guarantee the offer is genuine.
+          </>
         ) : (
-          <>⚠️ This checks for known scam patterns. A clean result doesn't guarantee the offer is genuine — always verify the company independently.</>
+          <>
+            ⚠️ This checks for known scam patterns. A clean result doesn't
+            guarantee the offer is genuine — always verify the company
+            independently.
+          </>
         )}
       </div>
 
       {hasConflictingLlm && (
         <div className="llm-opinion-section">
-          <h3 className="llm-heading">🤖 AI Second Opinion: {LLM_VERDICT_MAP[llmResult.verdict]}</h3>
+          <h3 className="llm-heading">
+            🤖 AI Second Opinion: {LLM_VERDICT_MAP[llmResult.verdict]}
+          </h3>
           <p className="llm-reasoning">{llmResult.reasoning}</p>
         </div>
       )}
@@ -83,10 +101,19 @@ export default function ResultCard({ result, llmResult, onReset }) {
           <span>Risk Level</span>
           <span className="score-pct">{percentage}%</span>
         </div>
-        <div className="score-bar-track" role="progressbar" aria-valuenow={percentage} aria-valuemin={0} aria-valuemax={100}>
+        <div
+          className="score-bar-track"
+          role="progressbar"
+          aria-valuenow={percentage}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
           <div
             className={`score-bar-fill ${meta.barClass}`}
-            style={{ width: `${barWidth}%`, transition: "width 0.8s cubic-bezier(0.34,1.56,0.64,1)" }}
+            style={{
+              width: `${barWidth}%`,
+              transition: "width 0.8s cubic-bezier(0.34,1.56,0.64,1)",
+            }}
           />
         </div>
         <div className="score-scale">
@@ -108,7 +135,9 @@ export default function ResultCard({ result, llmResult, onReset }) {
                 <li key={flag.id} className="flag-item">
                   <div className="flag-item-top">
                     <span className="flag-item-label">{flag.label}</span>
-                    <span className={`flag-severity-badge ${wl.cls}`}>{wl.text}</span>
+                    <span className={`flag-severity-badge ${wl.cls}`}>
+                      {wl.text}
+                    </span>
                   </div>
                   <p className="flag-item-detail">{flag.detail}</p>
                   <p className="flag-item-why">ℹ️ {flag.description}</p>
@@ -121,7 +150,8 @@ export default function ResultCard({ result, llmResult, onReset }) {
         <div className="no-flags">
           <p>✅ No specific red flags were detected in this message.</p>
           <p className="no-flags-sub">
-            Always verify independently — the checker is rule-based and cannot guarantee legitimacy.
+            Always verify independently — the checker is rule-based and cannot
+            guarantee legitimacy.
           </p>
         </div>
       )}
