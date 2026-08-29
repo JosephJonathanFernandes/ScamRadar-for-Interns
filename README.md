@@ -55,7 +55,7 @@ graph TD
 
 - **Frontend:** React 19, Vite, Tailwind CSS 4
 - **OCR:** `Tesseract.js` (with canvas-based grayscale/contrast preprocessing for accurate WhatsApp screenshot extraction).
-- **AI Layer:** Groq API (Llama models), orchestrated via a highly resilient Vercel Serverless Edge Function with 4-key round-robin rate-limit protection.
+- **AI Layer:** Groq API (`openai/gpt-oss-20b`), orchestrated via a highly resilient Vercel Serverless Edge Function with 4-key round-robin rate-limit protection.
 - **Testing:** In-app developer test suite (`/test`) validating 15 traced real-world cases.
 
 ---

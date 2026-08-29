@@ -39,7 +39,7 @@ We updated the UI to reflect this reality honestly:
 
 ### The LLM Second-Opinion Layer
 
-To solve the brittleness issue identified in our holdout testing, we implemented an **AI Second Opinion Layer**. This layer is built as a highly resilient **Vercel Serverless Function** (`api/llm-check.js`) using Groq's fast Llama inference endpoints.
+To solve the brittleness issue identified in our holdout testing, we implemented an **AI Second Opinion Layer**. This is built as a highly resilient **Vercel Serverless Function** (`api/llm-check.js`) using Groq's `openai/gpt-oss-20b` model, which successfully caught 100% of the holdout scams in testing.
 
 **Key Architecture Details:**
 - **Zero-Latency Primary Check**: The rule-based engine remains the fast, primary check. The LLM is strictly used as a fallback for ambiguous cases (`Suspicious` or `No Red Flags Found`). If a message is a blatant scam with upfront payment requests, the LLM is bypassed entirely to save costs and protect privacy.
