@@ -243,6 +243,40 @@ const RULES = [
         : { triggered: false };
     },
   },
+  {
+    id: "link_obfuscation",
+    label: "Uses Generic URL Shortener",
+    weight: 1,
+    description:
+      "Scammers often use generic link shorteners to hide the actual destination website. Genuine companies typically use their own domains or standard ATS platforms.",
+    check(text) {
+      const pattern = /https?:\/\/(?:www\.)?(tinyurl\.com|bit\.ly|cutt\.ly|ow\.ly|is\.gd|t\.co)\b/i;
+      const match = text.match(pattern);
+      return match
+        ? {
+            triggered: true,
+            detail: `Found generic URL shortener: ${match[1]}`,
+          }
+        : { triggered: false };
+    },
+  },
+  {
+    id: "fake_social_proof",
+    label: "Fake Social Proof / Enrollment Spam",
+    weight: 3,
+    description:
+      "Repeatedly announcing 'Congratulations to X' in a single message is a high-pressure manipulation tactic to manufacture fake demand.",
+    check(text) {
+      const pattern = /congratulations\s+to\s+[a-z]+/gi;
+      const matches = text.match(pattern);
+      return matches && matches.length >= 2
+        ? {
+            triggered: true,
+            detail: `Found repeated congratulations pattern (${matches.length} times) — likely fake social proof.`,
+          }
+        : { triggered: false };
+    },
+  },
 ];
 
 // ─── Scorer ──────────────────────────────────────────────────────────────────
