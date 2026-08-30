@@ -60,6 +60,28 @@ Output:
   "reasoning": "The message directs you to a legitimate company careers page without any pressure or suspicious requests."
 }
 
+Message: "Hey Rohan, thanks for the chat today! We'd love to offer you the Frontend Developer Internship at PixelCrafters. Stipend will be Rs. 15,000/month. It's a remote role. Since we're a small team, we operate fast. Please let me know if you accept by tomorrow EOD so we can plan next week's sprint. Best, Aman (Founder) pixelcrafters.tech@gmail.com"
+Output:
+{
+  "payment_requested": false,
+  "urgency_tactics": true,
+  "role_specificity": "clear",
+  "identity_verifiable": true,
+  "verdict": "genuine",
+  "reasoning": "This is an informal but realistic startup offer. The urgency is tied to a legitimate business reason (sprint planning), and there are no suspicious requests for fees or sensitive data."
+}
+
+Message: "*URGENT PLACEMENT UPDATE* Infosys has opened an off-campus internship drive for 2025 batch. Role: Systems Engineer Intern Stipend: ₹25,000/month. All interested students must fill the Google Form below by 5 PM TODAY. Do not miss this deadline as the link will close automatically. Form link: https://forms.gle/xyz"
+Output:
+{
+  "payment_requested": false,
+  "urgency_tactics": true,
+  "role_specificity": "clear",
+  "identity_verifiable": true,
+  "verdict": "genuine",
+  "reasoning": "This is a typical campus placement forwarded message. The urgency and capitalization are common from Training and Placement Officers (TPOs) trying to meet company deadlines, and filling a Google Form is standard procedure without any payment demands."
+}
+
 Message: "Congratulations on your selection at Wipro. Please pay the ₹1500 refundable security deposit to receive your offer letter and company laptop."
 Output:
 {
@@ -69,17 +91,6 @@ Output:
   "identity_verifiable": false,
   "verdict": "fake",
   "reasoning": "Legitimate companies like Wipro never ask for security deposits for laptops or offer letters. This is an advance-fee scam."
-}
-
-Message: "Hi, we are a seed-stage startup looking for a frontend intern for 1 month. The role is unpaid, but you will get to work closely with the founders on a live product. Email founders@newtech.io"
-Output:
-{
-  "payment_requested": false,
-  "urgency_tactics": false,
-  "role_specificity": "clear",
-  "identity_verifiable": true,
-  "verdict": "genuine",
-  "reasoning": "While unpaid, the message is transparent about the role, provides a professional email domain, and doesn't pressure you."
 }
 `;
 
