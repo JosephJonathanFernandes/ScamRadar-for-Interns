@@ -89,6 +89,17 @@ Output:
   "reasoning": "This is a typical campus placement forwarded message. The urgency and capitalization are common from Training and Placement Officers (TPOs) trying to meet company deadlines, and filling a Google Form is standard procedure without any payment demands."
 }
 
+Message: "Dear Candidate, We are thrilled to offer you the SWE Summer Internship at Google India. Your monthly stipend will be Rs. 1,10,000. Please log into the candidate portal to accept your offer and complete the background verification process within 3 days. Welcome to Google!"
+Output:
+{
+  "payment_requested": false,
+  "urgency_tactics": false,
+  "role_specificity": "clear",
+  "identity_verifiable": true,
+  "verdict": "genuine",
+  "reasoning": "High stipends (e.g., ₹1 Lakh+) are completely normal for top-tier tech companies like Google. The message asks for standard background verification via an official portal, with no requests for upfront fees."
+}
+
 Message: "Congratulations on your selection at Wipro. Please pay the ₹1500 refundable security deposit to receive your offer letter and company laptop."
 Output:
 {
