@@ -31,23 +31,28 @@ export default function App() {
       setResult(analysis);
     }
 
-    // Call LLM strictly as a fallback for ambiguous cases
-    if (
-      analysis.verdict === "Suspicious" ||
-      analysis.verdict === "No Red Flags Found"
-    ) {
+    // Call LLM as the primary semantic check for anything not confidently flagged
+    if (analysis.verdict !== "Likely Fake") {
       try {
         const response = await fetch("/api/llm-check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text }),
         });
-        const data = await response.json();
-        if (data.llmAvailable && data.result) {
-          setLlmResult(data.result);
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.llmAvailable && data.result) {
+            setLlmResult(data.result);
+          } else {
+            setLlmResult({ verdict: "error" });
+          }
+        } else {
+          setLlmResult({ verdict: "error" });
         }
       } catch (err) {
-        console.warn("LLM check failed silently:", err);
+        console.warn("LLM check failed:", err);
+        setLlmResult({ verdict: "error" });
       }
     }
 

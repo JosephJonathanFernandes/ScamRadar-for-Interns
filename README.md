@@ -8,11 +8,11 @@ A powerful, hybrid scam detection tool designed specifically to protect students
 
 Internship scams are increasingly sophisticated. While some scams are obvious (asking for an upfront "registration fee"), others rely on subtle psychological manipulation—using artificial urgency, spoofing legitimate company domains, and offering vague roles to harvest sensitive personal data (Aadhaar, PAN) or extract free labor.
 
-ScamRadar for Interns solves this by analyzing the text of recruitment messages using a two-tiered architecture: a fast, offline rule engine for known patterns, and an AI-powered fallback for ambiguous edge cases.
+ScamRadar for Interns solves this by analyzing the text of recruitment messages using a two-tiered architecture: a fast, offline rule engine for confirming obvious scams, and an AI-powered semantic check for everything else.
 
 ## The Hybrid Architecture
 
-Our approach prioritizes speed, privacy, and cost-efficiency. By using a rule engine as the first line of defense, we avoid sending every message to an LLM, reserving AI analysis only for nuanced cases.
+Our approach prioritizes speed, privacy, and cost-efficiency. By using a rule engine as the first line of defense, we avoid sending high-confidence scams to an LLM, reserving API quota for messages that need semantic analysis.
 
 ```text
 [ Raw Message ] 
@@ -22,22 +22,20 @@ Our approach prioritizes speed, privacy, and cost-efficiency. By using a rule en
        │
        ├─► High Score? ───── [ Verdict: Likely Fake ] (No API cost)
        │
-       ├─► Low Score? ────── [ Verdict: No Red Flags Found ]
-       │
-       └─► Ambiguous? 
+       └─► Low/Ambiguous? 
                │
                ▼
    [ Vercel Edge Proxy ] ─── (Round-robin API Key Rotation)
                │
                ▼
-[ Groq API (gpt-oss-20b) ] ─ (Contextual LLM Analysis)
+[ Groq API (gpt-oss-20b) ] ─ (Primary Semantic LLM Analysis)
                │
                ▼
       [ Final Verdict ]
 ```
 
 ### Why a Hybrid Approach?
-During our testing phase, the **rules-only engine achieved a 40% hit rate** on a holdout dataset of sophisticated scams (scams that did not explicitly ask for money). By integrating the LLM fallback for ambiguous cases, our **hit rate increased to 100%** without sacrificing false-positive precision (0% FPR). Read more about our architecture in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+During our testing phase, an adversarial audit revealed that the **rules-only engine is brittle to simple synonym swapping (the "Thesaurus Bypass")**. If a scam says "onboarding contribution" instead of "registration fee", it scores zero points. By integrating the LLM as the primary semantic check for any message that isn't already confidently flagged, our **hit rate increased to 100%** without sacrificing false-positive precision (0% FPR). Read more about our architecture in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Tech Stack
 

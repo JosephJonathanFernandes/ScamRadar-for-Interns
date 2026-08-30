@@ -43,7 +43,7 @@ export default function ResultCard({ result, llmResult, onReset }) {
 
   const didLlmRun = verdict !== "Likely Fake";
   const hasConflictingLlm =
-    llmResult && LLM_VERDICT_MAP[llmResult.verdict] !== verdict;
+    llmResult && llmResult.verdict !== "error" && LLM_VERDICT_MAP[llmResult.verdict] !== verdict;
 
   useEffect(() => {
     // Animate bar after mount
@@ -73,18 +73,26 @@ export default function ResultCard({ result, llmResult, onReset }) {
       <div className="verdict-disclaimer">
         {didLlmRun ? (
           <>
-            ⚠️ For unclear cases, this message was analyzed by an AI model for a
-            second opinion. Avoid pasting messages containing sensitive personal
-            information. A clean result doesn't guarantee the offer is genuine.
+            ⚠️ This message was analyzed by an AI model for a semantic second opinion.
+            Avoid pasting messages containing sensitive personal information. A clean result
+            doesn't guarantee the offer is genuine.
           </>
         ) : (
           <>
-            ⚠️ This checks for known scam patterns. A clean result doesn't
+            ⚠️ This message was confidently flagged by known scam patterns. A clean result doesn't
             guarantee the offer is genuine — always verify the company
             independently.
           </>
         )}
       </div>
+
+      {llmResult?.verdict === "error" && (
+        <div className="llm-opinion-section llm-error">
+          <p className="llm-reasoning" style={{ color: "#d97706" }}>
+            ⚠️ AI second-opinion check unavailable right now — result based on pattern rules only.
+          </p>
+        </div>
+      )}
 
       {hasConflictingLlm && (
         <div className="llm-opinion-section">

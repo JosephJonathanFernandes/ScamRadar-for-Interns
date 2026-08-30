@@ -8,9 +8,8 @@ ScamRadar for Interns uses a hybrid scanning approach to detect fraudulent inter
 flowchart TD
     A[Raw Message] --> B[Client-Side Rules Engine]
     B --> C{Rule Score}
-    C -->|High > 7| D[Likely Fake]
-    C -->|Low < 5| E[No Red Flags Found]
-    C -->|Ambiguous 5-7| F[Vercel Serverless Function]
+    C -->|High >= 7| D[Likely Fake]
+    C -->|Low/Ambiguous < 7| F[Vercel Serverless Function]
     F --> G[Groq API LLM Check]
     G --> H[Final Verdict]
 ```
@@ -26,12 +25,12 @@ This layer runs concurrently with the rule scanner. It extracts the company name
 - **Domain Similarity Check**: Flags emails that use suspicious variations of the company name (e.g., `@infosys-careers-india.com`).
 - **Web Presence Check**: Pings DuckDuckGo's Instant Answer API to confirm the company has a verifiable web presence.
 
-### 3. The LLM Fallback (`src/api/llm-check.js`)
-The rule engine is extremely effective at catching obvious scams (like explicit payment requests). However, a holdout test demonstrated that the rule-engine only had a **40% hit rate** on scams that rely on subtle psychological manipulation (e.g. vague data entry jobs with no explicit fee).
+### 3. The LLM Semantic Check (`src/api/llm-check.js`)
+The rule engine is extremely effective at catching obvious scams (like explicit payment requests). However, an adversarial audit demonstrated that the rule-engine is highly brittle to semantic evasion (the **"Thesaurus Bypass"**). For instance, replacing "registration fee" with "nominal onboarding contribution" results in a perfect 0 score and a "No Red Flags Found" verdict from the rule engine.
 
-To bridge this gap without sending every request to an LLM, we use a hybrid model:
-- If a message clearly fails the rules engine, we reject it locally to save costs and protect privacy.
-- If a message is **ambiguous**, we forward the text to our Vercel Serverless Function, which queries an Open-Source LLM (`openai/gpt-oss-20b`) via Groq for a secondary opinion. This increased our holdout hit-rate from 40% to **100%**.
+To solve this without wasting API calls on scams that are already confidently caught, we use a gatekeeper model:
+- If a message **confidently fails** the rules engine (Likely Fake), we reject it locally to save costs and protect privacy.
+- If a message is **anything else**, we forward the text to our Vercel Serverless Function, which queries an Open-Source LLM (`openai/gpt-oss-20b`) via Groq for semantic analysis. This prevents evasive scams from slipping through simply by avoiding regex keywords.
 
 ## LLM API Key Rotation
 To stay within the rate limits of Groq's free tier, our Serverless Function implements a round-robin key rotation strategy. 
