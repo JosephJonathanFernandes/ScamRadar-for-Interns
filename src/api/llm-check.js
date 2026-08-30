@@ -26,6 +26,13 @@ export default async function handler(req, res) {
   const systemPrompt = `You are a scam-detection assistant for Indian students evaluating WhatsApp-forwarded internship offers.
 Analyze the provided message and return ONLY structured JSON, with no markdown formatting or prose.
 
+CRITICAL CALIBRATION RULES:
+1. High Stipends: High stipends (e.g., ₹50k-1Lakh+) are normal for top-tier MNCs (Google, Amazon, etc.) and should NOT be flagged as suspicious if the company is legitimate and there are no other red flags.
+2. Standard Onboarding: Requesting PAN cards, bank details, or KYC documents is a standard part of onboarding IF the message indicates an interview has already occurred or an offer is being formalized.
+3. Government Internships: Government programs (e.g., NITI Aayog, NIC) often have strict, short deadlines and require NOCs/Police verification. This is normal procedure, not artificial urgency.
+4. Startup Informality: Extreme informality, conversational language, or using WhatsApp for communication is completely normal for early-stage startups and should be treated as neutral, not suspicious.
+5. Campus Programs: Unpaid campus ambassador roles offering merchandise, certificates, or WhatsApp group links are standard marketing programs and usually genuine.
+
 Structure:
 {
   "payment_requested": boolean,
