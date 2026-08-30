@@ -56,7 +56,7 @@ Output:
   "reasoning": "The email domain is fake, and it uses extreme urgency ('immediately to apply') for a supposed government role, which is a classic scam tactic."
 }
 
-Message: "We are looking for a marketing intern at Zuddl. This is a paid remote opportunity. If interested, please apply directly on our careers page: zuddl.com/careers"
+Message: "Hey man, loved the github repo you shared. Do you want to intern with us at BuildSpace this summer? We can do ₹20k a month. Let me know ASAP so I can send the paperwork."
 Output:
 {
   "payment_requested": false,
@@ -64,7 +64,7 @@ Output:
   "role_specificity": "clear",
   "identity_verifiable": true,
   "verdict": "genuine",
-  "reasoning": "The message directs you to a legitimate company careers page without any pressure or suspicious requests."
+  "reasoning": "This is an extremely informal direct message from a startup founder. While it lacks professional formatting and requests a fast reply ('ASAP'), this casual register is normal for early-stage startups and there are no suspicious requests for fees."
 }
 
 Message: "Hey Rohan, thanks for the chat today! We'd love to offer you the Frontend Developer Internship at PixelCrafters. Stipend will be Rs. 15,000/month. It's a remote role. Since we're a small team, we operate fast. Please let me know if you accept by tomorrow EOD so we can plan next week's sprint. Best, Aman (Founder) pixelcrafters.tech@gmail.com"
