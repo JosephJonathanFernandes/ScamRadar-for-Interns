@@ -37,11 +37,36 @@ const LLM_VERDICT_MAP = {
 
 export default function ResultCard({ result, llmResult, onReset }) {
   const { verdict, percentage, flags } = result;
-  const meta = VERDICT_META[verdict];
+  const meta = VERDICT_META[verdict] || VERDICT_META["No Red Flags Found"];
   const [barWidth, setBarWidth] = useState(0);
+  const [copied, setCopied] = useState(false);
   const cardRef = useRef(null);
 
   const didLlmRun = llmResult !== null;
+
+  const handleCopyWarning = () => {
+    const flagList = flags.map((f) => `• ${f.label}: ${f.detail}`).join("\n");
+    const summary = `🛡️ ScamRadar Internship Verification
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Verdict: ${verdict} (${percentage}% Risk)
+${flags.length > 0 ? `\n🚩 Red Flags Detected:\n${flagList}\n` : "\n✅ No immediate structural red flags detected.\n"}
+${llmResult?.reasoning ? `🤖 Analysis: ${llmResult.reasoning}\n` : ""}
+${
+  verdict === "Likely Fake"
+    ? "⚠️ Warning: Legitimate companies NEVER charge registration fees or laptop deposits upfront. Do NOT pay or share personal Aadhaar/bank details."
+    : verdict === "Suspicious"
+    ? "⚠️ Caution: High risk of scam or unverifiable recruiter. Always confirm via the company's official careers portal directly."
+    : "💡 Tip: Always verify official communication comes from a verified corporate domain."
+}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Checked via ScamRadar for Interns`;
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(summary);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+  };
 
   useEffect(() => {
     // Animate bar after mount
@@ -178,10 +203,70 @@ export default function ResultCard({ result, llmResult, onReset }) {
         </div>
       )}
 
+      {/* ── Student Action Guide ── */}
+      <div className="student-action-box">
+        <h4 className="student-action-title">
+          {verdict === "Likely Fake"
+            ? "🛑 What You Should Do Right Now:"
+            : verdict === "Suspicious"
+            ? "⚠️ Verification Steps for Students:"
+            : "💡 Safe Next Steps for Students:"}
+        </h4>
+        <ul className="student-action-list">
+          {verdict === "Likely Fake" ? (
+            <>
+              <li>
+                <strong>Never pay any upfront money:</strong> Legitimate companies provide laptops and training for free. Any demand for UPI, security deposits, or processing fees is 100% a scam.
+              </li>
+              <li>
+                <strong>Do not share identity documents:</strong> Never send Aadhaar photos, PAN card numbers, or bank account IFSC on WhatsApp before an official offer letter and signed contract.
+              </li>
+              <li>
+                <strong>Block & report the sender:</strong> Block the number on WhatsApp/Telegram immediately to prevent follow-up harassment.
+              </li>
+              <li>
+                <strong>Warn your classmates:</strong> Scammers frequently message entire college batches at once. Use the button below to warn your class group.
+              </li>
+            </>
+          ) : verdict === "Suspicious" ? (
+            <>
+              <li>
+                <strong>Look up the company directly:</strong> Search the company on Google or LinkedIn independently. Do not click links or forms sent in the message.
+              </li>
+              <li>
+                <strong>Insist on official domain email:</strong> Ask the recruiter to email you from their official corporate address (e.g. <code>@company.com</code>, not Gmail/Yahoo).
+              </li>
+              <li>
+                <strong>Ask about the interview format:</strong> Real internships conduct technical or HR interviews via Google Meet/Zoom, never text-only WhatsApp chats.
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <strong>Safe to share resume & portfolio:</strong> It is standard to share your CV, GitHub, or LinkedIn profile.
+              </li>
+              <li>
+                <strong>Informal messages are common:</strong> Early-stage startups and college TPOs frequently use WhatsApp for fast updates.
+              </li>
+              <li>
+                <strong>Keep personal IDs private until onboarding:</strong> Only share PAN/bank details after receiving an official appointment letter with company letterhead.
+              </li>
+            </>
+          )}
+        </ul>
+      </div>
+
       {/* ── Actions ── */}
       <div className="result-actions">
         <button className="btn-reset" onClick={onReset}>
           ← Check Another Message
+        </button>
+        <button
+          className="btn-copy-warning"
+          onClick={handleCopyWarning}
+          title="Copy formatted summary to share with classmates"
+        >
+          {copied ? "✅ Copied Summary to Clipboard!" : "📲 Copy Summary for WhatsApp Group"}
         </button>
       </div>
     </div>

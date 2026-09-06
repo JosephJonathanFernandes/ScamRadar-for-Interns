@@ -959,10 +959,12 @@ ul {
   font-weight: 400 !important;
 }
 
-/* Reset Button */
+/* Reset & Copy Buttons */
 .result-actions {
   display: flex;
-  justify-content: flex-start;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
   padding-top: var(--space-xs);
 }
 
@@ -975,12 +977,65 @@ ul {
   padding: 0.6rem 1.25rem;
   border-radius: var(--radius-md);
   transition: all 0.2s;
+  cursor: pointer;
 }
 
 .btn-reset:hover {
   color: var(--clr-text-primary);
   border-color: var(--clr-border-hover);
   transform: translateX(-2px);
+}
+
+.btn-copy-warning {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-copy-warning:hover {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.55);
+  color: #c7d2fe;
+}
+
+/* Student Action Guide */
+.student-action-box {
+  margin-top: 1.25rem;
+  padding: 1.1rem 1.25rem;
+  border-radius: var(--radius-md);
+  background: var(--clr-surface-2);
+  border: 1px solid var(--clr-border);
+}
+
+.student-action-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--clr-text-primary);
+}
+
+.student-action-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.student-action-list li {
+  font-size: 0.86rem;
+  color: var(--clr-text-secondary);
+  line-height: 1.45;
+}
+
+.student-action-list li strong {
+  color: var(--clr-text-primary);
 }
 
 /* ════════════════════════════════════════════════════════════════
