@@ -43,22 +43,22 @@ ScamRadar utilizes a multi-stage evaluation pipeline to ensure fast verdicts, ze
 
 ```mermaid
 flowchart TD
-    A[Student Input: Raw Text or Screenshot] --> B{Input Type}
-    B -->|Screenshot| C[Client-Side OCR & WhatsApp Cleaner]
-    B -->|Text| D[Client-Side Rules Scanner]
+    A["Student Input: Raw Text or Screenshot"] --> B{"Input Type"}
+    B -->|Screenshot| C["Client-Side OCR & WhatsApp Cleaner"]
+    B -->|Text| D["Client-Side Rules Scanner"]
     C --> D
     
-    D --> E{Rule Score}
-    E -->|Confidently Fake >= 7 pts| F[Likely Fake (Immediate Local Verdict)]
-    E -->|Ambiguous / Clean < 7 pts| G[RAG Retrieval Engine]
+    D --> E{"Rule Score"}
+    E -->|Score >= 7 pts| F["Likely Fake: Immediate Local Verdict"]
+    E -->|Score < 7 pts| G["RAG Retrieval Engine"]
     
-    G -->|BM25 + Semantic Boosters| H[(41 Verified Precedents Corpus)]
-    H -->|Top Matching Case Precedents| I[Vercel Serverless Function]
-    I -->|Prompt with Real Precedent Context| J[Groq Open-Source LLM]
+    G -->|BM25 + Semantic Boosters| H[("41 Verified Precedents Corpus")]
+    H -->|Top Matching Case Precedents| I["Vercel Serverless Function"]
+    I -->|Prompt with Real Precedent Context| J["Groq Open-Source LLM"]
     
-    J --> K[Score Calibrator]
+    J --> K["Score Calibrator"]
     D --> K
-    K --> L[Unified Result: Verdict + Calibrated Risk Bar + Student Guide]
+    K --> L["Unified Result: Verdict + Calibrated Risk Bar + Student Guide"]
 ```
 
 To dive deeper into the technical design, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).

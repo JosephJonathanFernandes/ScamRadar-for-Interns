@@ -23,38 +23,38 @@ ScamRadar implements a **Hybrid 5-Layer Pipeline**:
 
 ```mermaid
 flowchart TD
-    subgraph Client ["Client-Side (Browser)"]
-        A[Student Input: Text or Image Screenshot] --> B{Input Type}
-        B -->|Image| C[Canvas Preprocessing + Tesseract OCR]
-        C --> D[WhatsApp Artifact Stripper]
-        B -->|Text| E[Raw Text Normalization]
+    subgraph Client ["Client-Side Browser"]
+        A["Student Input: Text or Image Screenshot"] --> B{"Input Type"}
+        B -->|Image| C["Canvas Preprocessing + Tesseract OCR"]
+        C --> D["WhatsApp Artifact Stripper"]
+        B -->|Text| E["Raw Text Normalization"]
         D --> E
         
-        E --> F[Core Scanner: 9 Red-Flag Rules]
-        E --> G[Company Domain & Web Presence Check]
-        F --> H{Rule Score}
+        E --> F["Core Scanner: 9 Red-Flag Rules"]
+        E --> G["Company Domain & Web Presence Check"]
+        F --> H{"Rule Score"}
         G --> H
     end
 
     subgraph Gate ["Decision Gate"]
-        H -->|Confidently Fake >= 7 pts| I[Local Verdict: Likely Fake]
-        H -->|Ambiguous / Clean < 7 pts| J[Forward to RAG + LLM Check]
+        H -->|Score >= 7 pts| I["Local Verdict: Likely Fake"]
+        H -->|Score < 7 pts| J["Forward to RAG + LLM Check"]
     end
 
     subgraph Serverless ["Vercel Serverless Layer"]
-        J --> K[BM25 RAG Precedent Retriever]
-        K --> L[(Corpus: 41 Verified Precedents)]
-        L --> M[Top Matching Case Precedents]
-        M --> N[Groq API Proxy with Dynamic Key Rotation]
-        N --> O[Precedent-Grounded Semantic Inference]
+        J --> K["BM25 RAG Precedent Retriever"]
+        K --> L[("Corpus: 41 Verified Precedents")]
+        L --> M["Top Matching Case Precedents"]
+        M --> N["Groq API Proxy with Dynamic Key Rotation"]
+        N --> O["Precedent-Grounded Semantic Inference"]
     end
 
     subgraph Calibration ["Calibration & Presentation"]
-        O --> P[Unified Score Calibrator]
+        O --> P["Unified Score Calibrator"]
         F --> P
-        P --> Q[Synchronized Risk Level Bar 0-100%]
-        P --> R[Verdict Badge & Matched Precedent]
-        P --> S[Student Action Guide & WhatsApp Share]
+        P --> Q["Synchronized Risk Level Bar 0-100%"]
+        P --> R["Verdict Badge & Matched Precedent"]
+        P --> S["Student Action Guide & WhatsApp Share"]
     end
 ```
 
