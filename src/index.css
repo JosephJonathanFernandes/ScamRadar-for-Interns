@@ -756,6 +756,46 @@ ul {
   line-height: 1.5;
 }
 
+.llm-opinion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.calibrated-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+}
+
+.rag-precedent-box {
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  background: rgba(15, 23, 42, 0.45);
+  border-left: 3px solid #818cf8;
+  border-radius: 4px;
+}
+
+.rag-precedent-tag {
+  font-size: 0.8rem;
+  color: #c7d2fe;
+  margin-bottom: 0.25rem;
+}
+
+.rag-precedent-desc {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted, #94a3b8);
+  line-height: 1.4;
+}
+
 /* Score Bar */
 .score-section {
   display: flex;

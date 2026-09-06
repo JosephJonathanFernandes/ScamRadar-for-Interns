@@ -8,10 +8,13 @@ ScamRadar for Interns uses a hybrid scanning approach to detect fraudulent inter
 flowchart TD
     A[Raw Message] --> B[Client-Side Rules Engine]
     B --> C{Rule Score}
-    C -->|High >= 7| D[Likely Fake]
-    C -->|Low/Ambiguous < 7| F[Vercel Serverless Function]
-    F --> G[Groq API LLM Check]
-    G --> H[Final Verdict]
+    C -->|Confidently Fake >= 7| D[Likely Fake]
+    C -->|Ambiguous / Clean < 7| E[RAG Retrieval Engine]
+    E -->|BM25 Top Precedents| F[Vercel Serverless Function]
+    F --> G[Groq API LLM Analysis]
+    G --> H[Unified Score Calibrator]
+    B --> H
+    H --> I[Calibrated Risk Score & Verdict]
 ```
 
 ### 1. The Client-Side Rules Engine (`src/core/scanner.js`)
@@ -25,17 +28,33 @@ This layer runs concurrently with the rule scanner. It extracts the company name
 - **Domain Similarity Check**: Flags emails that use suspicious variations of the company name (e.g., `@infosys-careers-india.com`).
 - **Web Presence Check**: Pings DuckDuckGo's Instant Answer API to confirm the company has a verifiable web presence.
 
-### 3. The LLM Semantic Check (`src/api/llm-check.js`)
-The rule engine is extremely effective at catching obvious scams (like explicit payment requests). However, an adversarial audit demonstrated that the rule-engine is highly brittle to semantic evasion (the **"Thesaurus Bypass"**). For instance, replacing "registration fee" with "nominal onboarding contribution" results in a perfect 0 score and a "No Red Flags Found" verdict from the rule engine.
+### 3. The RAG Precedent Retrieval Engine (`src/core/rag/retriever.js`)
+To avoid "whack-a-mole" overfitting from static few-shot prompt anchors, ScamRadar employs an in-memory RAG (Retrieval-Augmented Generation) engine:
+- **Corpus (`src/core/rag/corpus.json`)**: Indexes 41 verified real-world internship offers (known scams and verified genuine offers).
+- **BM25 & Semantic Boosters**: Computes term IDF and matches structural signals (upfront fee keywords, Aadhaar/PAN requests, MNC stipend scales, Telegram/WhatsApp channels).
+- **Dynamic Context**: Extracts the top matching precedents to pass into the LLM system prompt as reference ground truth.
 
-To solve this without wasting API calls on scams that are already confidently caught, we use a gatekeeper model:
+### 4. The LLM Semantic Check (`src/api/llm-check.js`)
+The rule engine is effective at catching obvious structural scams. However, an adversarial audit demonstrated that rules are susceptible to semantic evasion (the **"Thesaurus Bypass"**). For instance, replacing "registration fee" with "nominal onboarding contribution" results in a perfect 0 score from regex rules.
+
+To solve this without unnecessary overhead:
 - If a message **confidently fails** the rules engine (Likely Fake), we reject it locally to save costs and protect privacy.
-- If a message is **anything else**, we forward the text to our Vercel Serverless Function, which queries an Open-Source LLM (`openai/gpt-oss-20b`) via Groq for semantic analysis. This prevents evasive scams from slipping through simply by avoiding regex keywords.
+- If a message is **anything else**, we forward the text and retrieved RAG precedents to our Vercel Serverless Function, which queries an Open-Source LLM (`openai/gpt-oss-20b`) via Groq for precedent-grounded semantic analysis.
+
+### 5. Unified Score Calibrator (`src/core/scoreCalibrator.js`)
+To prevent contradictory UI outputs (e.g. AI detecting a scam while the rule bar displays low risk):
+- The calibrator merges rule-based red flag detections with LLM semantic verdicts and RAG similarity.
+- Synchronizes the Risk Level percentage, progress bar track color, and main verdict banner into a single coherent assessment.
 
 ## LLM API Key Rotation
-To stay within the rate limits of Groq's free tier, our Serverless Function implements a round-robin key rotation strategy. 
-- If a key throws a `429 Too Many Requests` or `401 Unauthorized`, the proxy silently catches the error and moves to the next key in the pool.
-- The keys are stored in environment variables (`GROQ_API_KEY_1`, `GROQ_API_KEY_2`, etc.) and are never exposed to the client.
+To stay within the rate limits of Groq's free tier, our Serverless Function implements dynamic key discovery and rotation:
+- Scans `process.env` dynamically for any number of keys (`GROQ_API_KEY`, `GROQ_KEY`, `GROQ_API_KEY_*`, `GROQ_KEY_*`), supporting 1, 2, or more keys.
+- If a key throws `429 Too Many Requests`, `401 Unauthorized`, or times out after 12s, the handler catches the error and rotates to the next available key.
+- Keys are never exposed to the browser client.
 
-## Test Coverage Recommendation
-For future contributors, a test coverage of **70-80%** on the `src/core/` directory is highly recommended. The core rules and company verification logic are pure functions and are straightforward to unit test using Vitest.
+## Test Coverage
+The project maintains full Vitest coverage across all core modules:
+- `tests/unit/scanner.test.js`: Core regex rules and validation dataset benchmarks.
+- `tests/unit/retriever.test.js`: BM25 tokenization, stopword filtering, and precedent retrieval.
+- `tests/unit/keys.test.js`: Dynamic environment variable discovery, deduplication, and numeric sorting.
+- `tests/unit/calibrator.test.js`: Unified scoring matrix and threshold calibration.

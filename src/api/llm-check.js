@@ -1,3 +1,53 @@
+import { retrievePrecedents } from "../core/rag/retriever.js";
+
+/**
+ * Dynamically discovers and loads all Groq API keys present in the environment.
+ * Supports any number of keys (e.g. GROQ_API_KEY, GROQ_KEY, GROQ_API_KEY_1, GROQ_KEY_2, etc.)
+ *
+ * @returns {string[]} Ordered array of unique API keys
+ */
+export function getGroqKeys() {
+  // Load .env automatically if Node supports process.loadEnvFile
+  if (typeof process.loadEnvFile === "function") {
+    try {
+      process.loadEnvFile();
+    } catch {
+      // Ignore if .env is missing or already loaded
+    }
+  }
+
+  const discovered = new Set();
+
+  // 1. Direct single keys
+  if (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.trim()) {
+    discovered.add(process.env.GROQ_API_KEY.trim());
+  }
+  if (process.env.GROQ_KEY && process.env.GROQ_KEY.trim()) {
+    discovered.add(process.env.GROQ_KEY.trim());
+  }
+
+  // 2. Scan all environment variables matching GROQ_API_KEY_* or GROQ_KEY_*
+  const envKeys = Object.keys(process.env).filter((k) =>
+    /^GROQ_(?:API_)?KEY(?:_\d+)?$/i.test(k)
+  );
+
+  // Sort numerically so _1, _2, _3 maintain intuitive rotation order
+  envKeys.sort((a, b) => {
+    const numA = parseInt(a.replace(/\D/g, ""), 10) || 0;
+    const numB = parseInt(b.replace(/\D/g, ""), 10) || 0;
+    return numA - numB;
+  });
+
+  for (const k of envKeys) {
+    const val = process.env[k];
+    if (val && typeof val === "string" && val.trim().length > 0) {
+      discovered.add(val.trim());
+    }
+  }
+
+  return Array.from(discovered);
+}
+
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== "POST") {
@@ -9,113 +59,55 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Message is required" });
   }
 
-  // Load API keys (supporting either GROQ_KEY or GROQ_API_KEY)
-  const keys = [
-    process.env.GROQ_API_KEY_1 || process.env.GROQ_KEY_1,
-    process.env.GROQ_API_KEY_2 || process.env.GROQ_KEY_2,
-    process.env.GROQ_API_KEY_3 || process.env.GROQ_KEY_3,
-    process.env.GROQ_API_KEY_4 || process.env.GROQ_KEY_4,
-    process.env.GROQ_API_KEY_5 || process.env.GROQ_KEY_5,
-  ].filter(Boolean);
+  const keys = getGroqKeys();
 
   if (keys.length === 0) {
     console.warn("No Groq API keys found. Failing gracefully.");
     return res.status(200).json({ llmAvailable: false });
   }
 
-  const systemPrompt = `You are a scam-detection assistant for Indian students evaluating WhatsApp-forwarded internship offers.
-Analyze the provided message and return ONLY structured JSON, with no markdown formatting or prose.
+  // ── RAG Step: Retrieve relevant precedents from verified knowledge base ───
+  const retrievedPrecedents = retrievePrecedents(message, { limit: 3 });
 
-CRITICAL CALIBRATION RULES:
-1. High Stipends: High stipends (e.g., ₹50k-1Lakh+) are normal for top-tier MNCs (Google, Amazon, etc.) and should NOT be flagged as suspicious if the company is legitimate and there are no other red flags.
-2. Standard Onboarding: Requesting PAN cards, bank details, or KYC documents is a standard part of onboarding IF the message indicates an interview has already occurred or an offer is being formalized.
-3. Government Internships: Government programs (e.g., NITI Aayog, NIC) often have strict, short deadlines and require NOCs/Police verification. This is normal procedure, not artificial urgency.
-4. Startup Informality: Extreme informality, conversational language, or using WhatsApp for communication is completely normal for early-stage startups and should be treated as neutral, not suspicious.
-5. Campus Programs: Unpaid campus ambassador roles offering merchandise, certificates, or WhatsApp group links are standard marketing programs and usually genuine.
+  const precedentsContext = retrievedPrecedents
+    .map(
+      (p, i) =>
+        `Precedent ${i + 1} [Type: ${p.type.toUpperCase()} | Category: ${p.category} | Relevance: ${p.score}]\nDescription: ${p.description}\nMessage text: "${p.text}"\nGround Truth: ${p.type === "scam" ? "Scam" : "Genuine Offer"}`
+    )
+    .join("\n\n");
 
-Structure:
+  const systemPrompt = `You are an expert scam-detection analyst for Indian students evaluating WhatsApp and email forwarded internship offers.
+Analyze the provided candidate message by comparing it against the following verified reference precedents retrieved from our knowledge base:
+
+--- RETRIEVED VERIFIED PRECEDENTS ---
+${precedentsContext || "No close precedents found."}
+-------------------------------------
+
+CRITICAL EVALUATION GUIDELINES:
+1. High Stipends: High stipends (₹50k-₹1.5L+) are normal for top-tier MNCs (Google, Amazon, etc.) and should NOT be flagged as suspicious if the company is legitimate, provides standard candidate portals, and has no fee requests.
+2. Standard Onboarding: Requesting PAN cards, bank details, or KYC documents is normal IF an interview has already occurred or an offer is being formalized. However, requesting Aadhaar/bank details upfront with NO interview is identity harvesting.
+3. Government Programs: Official government schemes (NITI Aayog, NIC) have formal procedures; scammers frequently impersonate them using fake domains or Gmail addresses.
+4. Startup Informality: Extreme informality, conversational language, or WhatsApp outreach is normal for early-stage startups as long as no upfront fee is requested.
+5. Upfront Fees / Deposits: ANY request for a registration fee, laptop deposit, training kit charge, or software license is an IMMEDIATE scam.
+
+Structure of response: Return ONLY structured JSON, with no markdown formatting or prose.
 {
   "payment_requested": boolean,
   "urgency_tactics": boolean,
   "role_specificity": "vague" | "clear",
   "identity_verifiable": boolean,
   "verdict": "genuine" | "suspicious" | "fake",
-  "reasoning": "One or two plain-English sentences a first-year engineering student would understand."
-}
+  "risk_score": number, // Estimated risk percentage 0 (safe) to 100 (definite scam)
+  "matched_precedent_id": string, // ID of the most relevant precedent from above
+  "reasoning": "One or two plain-English sentences a student can understand explaining the verdict with reference to the precedent."
+}`;
 
-EXAMPLES:
-
-Message: "Ministry of IT Internship 2024. Stipend: ₹15,000/month. Only 10 slots available. Send your resume to admin@nic-internships-india.com immediately to apply."
-Output:
-{
-  "payment_requested": false,
-  "urgency_tactics": true,
-  "role_specificity": "vague",
-  "identity_verifiable": false,
-  "verdict": "fake",
-  "reasoning": "The email domain is fake, and it uses extreme urgency ('immediately to apply') for a supposed government role, which is a classic scam tactic."
-}
-
-Message: "Hey man, loved the github repo you shared. Do you want to intern with us at BuildSpace this summer? We can do ₹20k a month. Let me know ASAP so I can send the paperwork."
-Output:
-{
-  "payment_requested": false,
-  "urgency_tactics": false,
-  "role_specificity": "clear",
-  "identity_verifiable": true,
-  "verdict": "genuine",
-  "reasoning": "This is an extremely informal direct message from a startup founder. While it lacks professional formatting and requests a fast reply ('ASAP'), this casual register is normal for early-stage startups and there are no suspicious requests for fees."
-}
-
-Message: "Hey Rohan, thanks for the chat today! We'd love to offer you the Frontend Developer Internship at PixelCrafters. Stipend will be Rs. 15,000/month. It's a remote role. Since we're a small team, we operate fast. Please let me know if you accept by tomorrow EOD so we can plan next week's sprint. Best, Aman (Founder) pixelcrafters.tech@gmail.com"
-Output:
-{
-  "payment_requested": false,
-  "urgency_tactics": true,
-  "role_specificity": "clear",
-  "identity_verifiable": true,
-  "verdict": "genuine",
-  "reasoning": "This is an informal but realistic startup offer. The urgency is tied to a legitimate business reason (sprint planning), and there are no suspicious requests for fees or sensitive data."
-}
-
-Message: "*URGENT PLACEMENT UPDATE* Infosys has opened an off-campus internship drive for 2025 batch. Role: Systems Engineer Intern Stipend: ₹25,000/month. All interested students must fill the Google Form below by 5 PM TODAY. Do not miss this deadline as the link will close automatically. Form link: https://forms.gle/xyz"
-Output:
-{
-  "payment_requested": false,
-  "urgency_tactics": true,
-  "role_specificity": "clear",
-  "identity_verifiable": true,
-  "verdict": "genuine",
-  "reasoning": "This is a typical campus placement forwarded message. The urgency and capitalization are common from Training and Placement Officers (TPOs) trying to meet company deadlines, and filling a Google Form is standard procedure without any payment demands."
-}
-
-Message: "Dear Candidate, We are thrilled to offer you the SWE Summer Internship at Google India. Your monthly stipend will be Rs. 1,10,000. Please log into the candidate portal to accept your offer and complete the background verification process within 3 days. Welcome to Google!"
-Output:
-{
-  "payment_requested": false,
-  "urgency_tactics": false,
-  "role_specificity": "clear",
-  "identity_verifiable": true,
-  "verdict": "genuine",
-  "reasoning": "High stipends (e.g., ₹1 Lakh+) are completely normal for top-tier tech companies like Google. The message asks for standard background verification via an official portal, with no requests for upfront fees."
-}
-
-Message: "Congratulations on your selection at Wipro. Please pay the ₹1500 refundable security deposit to receive your offer letter and company laptop."
-Output:
-{
-  "payment_requested": true,
-  "urgency_tactics": false,
-  "role_specificity": "vague",
-  "identity_verifiable": false,
-  "verdict": "fake",
-  "reasoning": "Legitimate companies like Wipro never ask for security deposits for laptops or offer letters. This is an advance-fee scam."
-}
-`;
+  const model = process.env.GROQ_MODEL || "openai/gpt-oss-20b";
 
   // Helper function to call Groq with a specific key
   const callGroq = async (apiKey) => {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
 
     try {
       const response = await fetch(
@@ -127,7 +119,7 @@ Output:
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "openai/gpt-oss-20b",
+            model,
             messages: [
               { role: "system", content: systemPrompt },
               { role: "user", content: `Message to analyze: "${message}"` },
@@ -147,7 +139,10 @@ Output:
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Groq API error: ${response.status} - ${errorText}`);
+        return {
+          status: response.status,
+          error: new Error(`Groq API error: ${response.status} - ${errorText}`),
+        };
       }
 
       const data = await response.json();
@@ -155,7 +150,7 @@ Output:
     } catch (error) {
       clearTimeout(timeoutId);
       if (error.name === "AbortError") {
-        console.warn("Groq API request timed out.");
+        console.warn("Groq API request timed out after 12s.");
       } else {
         console.warn("Groq API request failed:", error.message);
       }
@@ -171,23 +166,34 @@ Output:
       try {
         const content = result.data.choices[0].message.content;
         const parsed = JSON.parse(content);
-        return res.status(200).json({ llmAvailable: true, result: parsed });
+        return res.status(200).json({
+          llmAvailable: true,
+          result: parsed,
+          precedents: retrievedPrecedents,
+        });
       } catch (parseError) {
         console.warn("Failed to parse Groq response as JSON:", parseError);
-        return res.status(200).json({ llmAvailable: false });
+        // JSON parse issue from LLM output — try next key if available
+        continue;
       }
     } else if (result.status === 429 || result.status === 401) {
       console.warn(
-        `Key ${i + 1} failed (${result.status}). Trying next key...`
+        `Groq key ${i + 1}/${keys.length} returned ${result.status}. Rotating to next key...`
       );
-      continue; // Try next key
+      continue;
     } else {
-      // 500 or timeout — fail gracefully, no need to burn other keys if API is down
-      return res.status(200).json({ llmAvailable: false });
+      // 500 or timeout — rotate to next key to give other keys/connections a chance
+      console.warn(
+        `Groq key ${i + 1}/${keys.length} encountered error (${result.status}). Rotating to next key...`
+      );
+      continue;
     }
   }
 
   // If we exhaust all keys
-  console.warn("All Groq keys exhausted or invalid.");
-  return res.status(200).json({ llmAvailable: false });
+  console.warn(`All ${keys.length} Groq key(s) exhausted or failed.`);
+  return res.status(200).json({
+    llmAvailable: false,
+    precedents: retrievedPrecedents,
+  });
 }

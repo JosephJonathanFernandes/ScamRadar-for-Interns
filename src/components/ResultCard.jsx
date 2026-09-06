@@ -41,9 +41,7 @@ export default function ResultCard({ result, llmResult, onReset }) {
   const [barWidth, setBarWidth] = useState(0);
   const cardRef = useRef(null);
 
-  const didLlmRun = verdict !== "Likely Fake";
-  const hasConflictingLlm =
-    llmResult && llmResult.verdict !== "error" && LLM_VERDICT_MAP[llmResult.verdict] !== verdict;
+  const didLlmRun = llmResult !== null;
 
   useEffect(() => {
     // Animate bar after mount
@@ -73,7 +71,7 @@ export default function ResultCard({ result, llmResult, onReset }) {
       <div className="verdict-disclaimer">
         {didLlmRun ? (
           <>
-            ⚠️ This message was analyzed by an AI model for a semantic second opinion.
+            ⚠️ This message was analyzed by an AI model calibrated against verified reference precedents.
             Avoid pasting messages containing sensitive personal information. A clean result
             doesn't guarantee the offer is genuine.
           </>
@@ -94,12 +92,28 @@ export default function ResultCard({ result, llmResult, onReset }) {
         </div>
       )}
 
-      {hasConflictingLlm && (
+      {llmResult && llmResult.verdict !== "error" && (
         <div className="llm-opinion-section">
-          <h3 className="llm-heading">
-            🤖 AI Second Opinion: {LLM_VERDICT_MAP[llmResult.verdict]}
-          </h3>
+          <div className="llm-opinion-header">
+            <h3 className="llm-heading">
+              🤖 AI & Precedent Analysis: {LLM_VERDICT_MAP[llmResult.verdict] || llmResult.verdict}
+            </h3>
+            {result.isUnified && (
+              <span className="calibrated-badge">Calibrated</span>
+            )}
+          </div>
           <p className="llm-reasoning">{llmResult.reasoning}</p>
+
+          {result.matchedPrecedent && (
+            <div className="rag-precedent-box">
+              <div className="rag-precedent-tag">
+                📚 Verified Reference Precedent: <strong>{result.matchedPrecedent.category}</strong>
+              </div>
+              <p className="rag-precedent-desc">
+                {result.matchedPrecedent.description}
+              </p>
+            </div>
+          )}
         </div>
       )}
 

@@ -5,6 +5,7 @@ import RedFlagsGuide from "./components/RedFlagsGuide";
 import TestSuitePage from "./components/TestSuitePage";
 import { analyzeMessage } from "./core/scanner.js";
 import { checkCompany } from "./core/companyCheck.js";
+import { calibrateResult } from "./core/scoreCalibrator.js";
 
 export default function App() {
   const [result, setResult] = useState(null);
@@ -14,7 +15,7 @@ export default function App() {
 
   /**
    * Async: runs company check (network, up to 2 s) then merges company flags
-   * into the synchronous scanner verdict.
+   * into the synchronous scanner verdict, followed by LLM + RAG precedent analysis.
    */
   const handleAnalyze = async (text) => {
     setIsAnalyzing(true);
@@ -23,12 +24,12 @@ export default function App() {
     try {
       const companyFlags = await checkCompany(text);
       analysis = analyzeMessage(text, companyFlags);
-      setResult(analysis);
+      setResult(calibrateResult(analysis, null));
     } catch {
       // Should never reach here — checkCompany is already guarded internally,
       // but just in case, fall back to scanning without company flags.
       analysis = analyzeMessage(text, []);
-      setResult(analysis);
+      setResult(calibrateResult(analysis, null));
     }
 
     // Call LLM as the primary semantic check for anything not confidently flagged
@@ -39,20 +40,25 @@ export default function App() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text }),
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           if (data.llmAvailable && data.result) {
             setLlmResult(data.result);
+            const unified = calibrateResult(analysis, data.result, data.precedents);
+            setResult(unified);
           } else {
             setLlmResult({ verdict: "error" });
+            setResult(calibrateResult(analysis, { verdict: "error" }, data?.precedents));
           }
         } else {
           setLlmResult({ verdict: "error" });
+          setResult(calibrateResult(analysis, { verdict: "error" }));
         }
       } catch (err) {
         console.warn("LLM check failed:", err);
         setLlmResult({ verdict: "error" });
+        setResult(calibrateResult(analysis, { verdict: "error" }));
       }
     }
 

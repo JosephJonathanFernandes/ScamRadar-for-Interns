@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 
 function vercelApiProxy() {
   return {
@@ -14,6 +14,12 @@ function vercelApiProxy() {
           });
           req.on('end', async () => {
             try {
+              // Populate process.env from .env in dev server
+              const loaded = loadEnv('development', process.cwd(), '');
+              for (const [k, v] of Object.entries(loaded)) {
+                if (!process.env[k]) process.env[k] = v;
+              }
+
               req.body = JSON.parse(body);
               const { default: handler } = await import('./src/api/llm-check.js');
               
