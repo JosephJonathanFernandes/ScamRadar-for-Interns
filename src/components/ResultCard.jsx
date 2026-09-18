@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   ShieldCheckIcon,
   ShieldAlertIcon,
@@ -9,6 +9,11 @@ import {
   CopyIcon,
   CheckIcon,
   ArrowLeftIcon,
+  PrinterIcon,
+  GlobeIcon,
+  CreditCardIcon,
+  UserCheckIcon,
+  LockIcon,
 } from "./icons.jsx";
 
 const VERDICT_META = {
@@ -88,6 +93,54 @@ Analyzed by ScamRadar Threat Intelligence`;
     return () => clearTimeout(t);
   }, [percentage]);
 
+  const hasPayment = flags.some((f) => f.id === "payment_request");
+  const hasDomainRisk = flags.some((f) =>
+    ["personal_email", "domain_mismatch", "link_obfuscation"].includes(f.id)
+  );
+  const hasVettingBypass = flags.some((f) =>
+    ["no_interview", "fake_social_proof", "vague_role"].includes(f.id)
+  );
+  const hasDataHarvest = flags.some((f) => f.id === "sensitive_info");
+
+  const pillars = [
+    {
+      id: "finance",
+      label: "Financial Demands",
+      desc: "Upfront fees, deposits, or UPI requests",
+      passed: !hasPayment,
+      statusText: hasPayment ? "VIOLATION DETECTED" : "VERIFIED CLEAN",
+      statusClass: hasPayment ? "pillar-crit" : "pillar-pass",
+      Icon: CreditCardIcon,
+    },
+    {
+      id: "domain",
+      label: "Domain & Recruiter Routing",
+      desc: "Verified domain vs Gmail or phishing links",
+      passed: !hasDomainRisk,
+      statusText: hasDomainRisk ? "ANOMALY DETECTED" : "VERIFIED AUTHENTIC",
+      statusClass: hasDomainRisk ? "pillar-warn" : "pillar-pass",
+      Icon: GlobeIcon,
+    },
+    {
+      id: "vetting",
+      label: "Candidate Vetting Process",
+      desc: "Structured assessment vs instant bypass",
+      passed: !hasVettingBypass,
+      statusText: hasVettingBypass ? "BYPASSED VETTING" : "STANDARD PROCESS",
+      statusClass: hasVettingBypass ? "pillar-warn" : "pillar-pass",
+      Icon: UserCheckIcon,
+    },
+    {
+      id: "identity",
+      label: "Identity & Credential Safety",
+      desc: "Pre-interview Aadhaar/PAN requests",
+      passed: !hasDataHarvest,
+      statusText: hasDataHarvest ? "HARVESTING RISK" : "SECURE",
+      statusClass: hasDataHarvest ? "pillar-crit" : "pillar-pass",
+      Icon: LockIcon,
+    },
+  ];
+
   const StatusIcon = meta.Icon;
 
   return (
@@ -161,6 +214,33 @@ Analyzed by ScamRadar Threat Intelligence`;
           <span className="legend-step legend-mod">26–60 Elevated</span>
           <span className="legend-step legend-high">61–85 High</span>
           <span className="legend-step legend-crit">86–100 Critical</span>
+        </div>
+      </div>
+
+      {/* ── Four-Pillar Forensic Verification Matrix ── */}
+      <div className="forensic-matrix-card">
+        <div className="forensic-matrix-header">
+          <span className="matrix-eyebrow">FORENSIC VERIFICATION AUDIT</span>
+          <h3 className="matrix-title">Four-Pillar Security Scorecard</h3>
+        </div>
+        <div className="pillars-grid">
+          {pillars.map((p) => {
+            const PIcon = p.Icon;
+            return (
+              <div key={p.id} className={`pillar-card ${p.statusClass}`}>
+                <div className="pillar-header">
+                  <div className="pillar-icon-wrap">
+                    <PIcon size={16} />
+                  </div>
+                  <span className={`pillar-status-badge ${p.statusClass}`}>
+                    {p.statusText}
+                  </span>
+                </div>
+                <h4 className="pillar-label">{p.label}</h4>
+                <p className="pillar-desc">{p.desc}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -350,6 +430,15 @@ Analyzed by ScamRadar Threat Intelligence`;
         <button className="btn-secondary-action" onClick={onReset}>
           <ArrowLeftIcon size={16} />
           Inspect Another Communication
+        </button>
+        <button
+          type="button"
+          className="btn-secondary-action btn-print-briefing"
+          onClick={() => window.print()}
+          title="Print or export incident briefing to PDF"
+        >
+          <PrinterIcon size={16} />
+          Save PDF / Print
         </button>
         <button
           className="btn-primary-action"

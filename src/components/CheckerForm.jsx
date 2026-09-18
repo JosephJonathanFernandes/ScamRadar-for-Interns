@@ -14,6 +14,37 @@ import {
 
 const MAX_CHARS = 5000;
 
+const DEMO_SCENARIOS = [
+  {
+    id: "scam-deposit",
+    label: "Wipro Laptop Deposit Scam (₹1,500 via UPI)",
+    tag: "Advance-Fee Scam",
+    badgeClass: "chip-fake",
+    text: "Congratulations on your selection at Wipro Technologies! You have been selected for the Data Analyst Internship. Monthly stipend: ₹35,000. Work from home. To receive your official offer letter, employee ID, and company-provided laptop, please transfer the refundable security deposit of ₹1,500 via UPI to hr.wipro@okaxis within 24 hours.",
+  },
+  {
+    id: "genuine-google",
+    label: "Google SWE Summer Intern (₹1.1L Stipend)",
+    tag: "Genuine Top MNC",
+    badgeClass: "chip-genuine",
+    text: "Dear Candidate, We are thrilled to offer you the Software Engineering Summer Internship at Google India. Monthly stipend: ₹1,10,000. Location: Bangalore / Hyderabad. Your formal offer letter and background verification instructions have been uploaded to your candidate portal at https://careers.google.com/dashboard. No fee or deposit is ever required at any stage of our recruitment process.",
+  },
+  {
+    id: "scam-telegram",
+    label: "Telegram Task & Like Scam (₹1,500/day)",
+    tag: "Task Fraud",
+    badgeClass: "chip-fake",
+    text: "Part time online job! Subscribe to our partner Telegram channels and like Google Maps locations to earn ₹1,500 daily. No interview. Direct selection. Message our executive on Telegram https://t.me/task_earn_online to start immediately.",
+  },
+  {
+    id: "scam-identity",
+    label: "Pre-Interview Identity Theft (Aadhaar/IFSC)",
+    tag: "Identity Harvest",
+    badgeClass: "chip-suspicious",
+    text: "You are directly shortlisted for the Graphic Design Internship with TechEra Solutions. No interview required. To issue your offer letter, reply on WhatsApp with photos of your Aadhaar card, PAN card number, and bank account IFSC code within 12 hours.",
+  },
+];
+
 export default function CheckerForm({ onAnalyze }) {
   // Main textarea (direct paste path)
   const [text, setText] = useState("");
@@ -134,7 +165,26 @@ export default function CheckerForm({ onAnalyze }) {
             <label htmlFor="message-input" className="form-label">
               Offer Communication or Message Transcript
             </label>
-            <span className="form-sublabel">Direct Text Inspection</span>
+            <span className="form-sublabel">Direct Input</span>
+          </div>
+
+          {/* Quick Demo Benchmark Presets */}
+          <div className="demo-scenarios-panel">
+            <span className="demo-scenarios-title">DEMO BENCHMARK PRESETS:</span>
+            <div className="demo-chips-grid">
+              {DEMO_SCENARIOS.map((sc) => (
+                <button
+                  key={sc.id}
+                  type="button"
+                  className="demo-chip-btn"
+                  onClick={() => setText(sc.text)}
+                  title="Click to load sample message into the inspector"
+                >
+                  <span className={`chip-badge ${sc.badgeClass}`}>{sc.tag}</span>
+                  <span className="chip-label">{sc.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="textarea-wrapper">

@@ -302,6 +302,96 @@ input, textarea {
   color: var(--clr-text-muted);
 }
 
+/* ── Quick Demo Benchmark Presets ────────────────────────────────── */
+
+.demo-scenarios-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  background-color: var(--clr-surface-2);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.85rem;
+}
+
+.demo-scenarios-title {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--clr-text-muted);
+}
+
+.demo-chips-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+}
+
+@media (min-width: 640px) {
+  .demo-chips-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.demo-chip-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--clr-surface-1);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.55rem;
+  font-size: 0.75rem;
+  color: var(--clr-text-secondary);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.demo-chip-btn:hover {
+  background: var(--clr-surface-3);
+  border-color: var(--clr-border-hover);
+  color: var(--clr-text-primary);
+}
+
+.chip-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.chip-fake {
+  background-color: var(--clr-fake-bg);
+  border: 1px solid var(--clr-fake-border);
+  color: var(--clr-fake);
+}
+
+.chip-genuine {
+  background-color: var(--clr-genuine-bg);
+  border: 1px solid var(--clr-genuine-border);
+  color: var(--clr-genuine);
+}
+
+.chip-suspicious {
+  background-color: var(--clr-suspicious-bg);
+  border: 1px solid var(--clr-suspicious-border);
+  color: var(--clr-suspicious);
+}
+
+.chip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.725rem;
+}
+
 .textarea-wrapper {
   background-color: var(--clr-surface-2);
   border: 1px solid var(--clr-border);
@@ -880,6 +970,135 @@ input, textarea {
   font-size: 0.675rem;
   color: var(--clr-text-muted);
   font-variant-numeric: tabular-nums;
+}
+
+/* ── Four-Pillar Forensic Verification Matrix ────────────────────── */
+
+.forensic-matrix-card {
+  background-color: var(--clr-surface-2);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+}
+
+.forensic-matrix-header {
+  margin-bottom: 0.875rem;
+}
+
+.matrix-eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #38bdf8;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.matrix-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.pillars-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.625rem;
+}
+
+@media (min-width: 640px) {
+  .pillars-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.pillar-card {
+  background-color: var(--clr-surface-1);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: border-color 0.15s ease;
+}
+
+.pillar-card.pillar-pass {
+  border-left: 3px solid var(--clr-genuine);
+}
+
+.pillar-card.pillar-warn {
+  border-left: 3px solid var(--clr-suspicious);
+}
+
+.pillar-card.pillar-crit {
+  border-left: 3px solid var(--clr-fake);
+}
+
+.pillar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
+.pillar-icon-wrap {
+  color: var(--clr-text-muted);
+  display: flex;
+  align-items: center;
+}
+
+.pillar-card.pillar-pass .pillar-icon-wrap {
+  color: var(--clr-genuine);
+}
+
+.pillar-card.pillar-warn .pillar-icon-wrap {
+  color: var(--clr-suspicious);
+}
+
+.pillar-card.pillar-crit .pillar-icon-wrap {
+  color: var(--clr-fake);
+}
+
+.pillar-status-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.12rem 0.4rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.pillar-status-badge.pillar-pass {
+  background-color: var(--clr-genuine-bg);
+  border: 1px solid var(--clr-genuine-border);
+  color: var(--clr-genuine);
+}
+
+.pillar-status-badge.pillar-warn {
+  background-color: var(--clr-suspicious-bg);
+  border: 1px solid var(--clr-suspicious-border);
+  color: var(--clr-suspicious);
+}
+
+.pillar-status-badge.pillar-crit {
+  background-color: var(--clr-fake-bg);
+  border: 1px solid var(--clr-fake-border);
+  color: var(--clr-fake);
+}
+
+.pillar-label {
+  font-size: 0.825rem;
+  font-weight: 600;
+}
+
+.pillar-desc {
+  font-size: 0.725rem;
+  color: var(--clr-text-muted);
+  line-height: 1.4;
 }
 
 /* ── Knowledge Base Reference (RAG) ──────────────────────────────── */
@@ -1725,4 +1944,75 @@ input, textarea {
 .footer-disclaimer {
   font-size: 0.725rem;
   color: var(--clr-text-muted);
+}
+
+/* ── Print / PDF Incident Briefing Export ─────────────────────────── */
+
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  .app-header,
+  .app-nav,
+  .how-it-works,
+  .red-flags-guide,
+  .checker-card,
+  .report-action-bar,
+  .app-footer,
+  .btn-print-briefing {
+    display: none !important;
+  }
+
+  .app-container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .result-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    gap: 1.25rem !important;
+  }
+
+  .report-header {
+    border-bottom: 2px solid #0f172a !important;
+  }
+
+  .verdict-title {
+    color: #0f172a !important;
+  }
+
+  .threat-index-card,
+  .forensic-matrix-card,
+  .rag-reference-card,
+  .indicator-card,
+  .protocol-step-card {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+  }
+
+  .threat-score-value,
+  .pillar-label,
+  .indicator-label,
+  .protocol-step-card strong {
+    color: #0f172a !important;
+  }
+
+  .threat-desc,
+  .verdict-audit-note,
+  .pillar-desc,
+  .indicator-detail,
+  .indicator-why-text,
+  .protocol-step-card p {
+    color: #334155 !important;
+  }
+
+  .score-track {
+    background: #e2e8f0 !important;
+    border: 1px solid #cbd5e1 !important;
+  }
 }

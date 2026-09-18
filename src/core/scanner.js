@@ -25,6 +25,11 @@ const RULES = [
         /documentation\s*(?:fee|charge|cost)/i,
         /verification\s*(?:fee|charge|deposit)/i,
         /activation\s*(?:fee|charge)/i,
+        // Indian UPI handles and payment apps
+        /[a-zA-Z0-9.\-_]{2,}@(okhdfcbank|okaxis|oksbi|okicici|paytm|ybl|apl|upi|postbank|axl|ibl|barodampay|cnrb|federal)\b/i,
+        /\bupi\s*(?:id|transfer|payment|handle)?\s*[:\-–]?\s*[a-zA-Z0-9.\-_]+@[a-zA-Z]+/i,
+        /\b(?:pay|send|transfer)\s+(?:via|through|to|on)\s+(?:upi|gpay|google\s*pay|phonepe|paytm|bhim)/i,
+        /\b(?:scan|pay\s+via)\s+(?:the\s+)?qr\s*code\b/i,
         // Amount + scam action word  —  require "pay/deposit/send/transfer/charge"
         // AFTER the amount to avoid matching "Rs 10,000/month stipend"
         /(?:₹|rs\.?|inr)\s*[\d,]+\s*(?:pay|deposit|fee|charge|send|transfer)/i,
@@ -39,7 +44,7 @@ const RULES = [
       return matches > 0
         ? {
             triggered: true,
-            detail: "Message mentions a payment, fee, or deposit requirement.",
+            detail: "Message mentions an unauthorized payment, fee, deposit, or UPI transfer requirement.",
           }
         : { triggered: false };
     },
@@ -245,19 +250,31 @@ const RULES = [
   },
   {
     id: "link_obfuscation",
-    label: "Uses Generic URL Shortener",
-    weight: 1,
+    label: "Obfuscated or Suspicious URL Detected",
+    weight: 2,
     description:
-      "Scammers often use generic link shorteners to hide the actual destination website. Genuine companies typically use their own domains or standard ATS platforms.",
+      "Scammers frequently use link shorteners, suspicious top-level domains (.xyz, .top, .site), or Telegram channels to conceal fraudulent destinations.",
     check(text) {
-      const pattern = /https?:\/\/(?:www\.)?(tinyurl\.com|bit\.ly|cutt\.ly|ow\.ly|is\.gd|t\.co)\b/i;
-      const match = text.match(pattern);
-      return match
-        ? {
-            triggered: true,
-            detail: `Found generic URL shortener: ${match[1]}`,
-          }
-        : { triggered: false };
+      const shortenerPattern = /https?:\/\/(?:www\.)?(tinyurl\.com|bit\.ly|cutt\.ly|ow\.ly|is\.gd|t\.co|t\.me|telegram\.me)\b[^\s]*/i;
+      const suspiciousTldPattern = /https?:\/\/[a-zA-Z0-9.\-]+\.(?:xyz|top|site|work|click|buzz|club|space|fit)\b[^\s]*/i;
+
+      const shortMatch = text.match(shortenerPattern);
+      if (shortMatch) {
+        return {
+          triggered: true,
+          detail: `Found obfuscated link or unofficial channel: ${shortMatch[0]}`,
+        };
+      }
+
+      const tldMatch = text.match(suspiciousTldPattern);
+      if (tldMatch) {
+        return {
+          triggered: true,
+          detail: `Found high-risk phishing TLD: ${tldMatch[0]}`,
+        };
+      }
+
+      return { triggered: false };
     },
   },
   {

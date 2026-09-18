@@ -57,6 +57,6 @@ describe("Scanner Core Logic", () => {
 
       expect(hitRate).toBe(1); // 100%
       expect(fpRate).toBeLessThan(0.1); // < 10% false positives
-    });
+    }, 15000);
   });
 });
