@@ -1,75 +1,89 @@
-import React from "react";
+import {
+  ShieldAlertIcon,
+  InfoIcon,
+} from "./icons.jsx";
 
-const flags = [
+const THREAT_VECTORS = [
   {
-    icon: "💸",
-    title: "Upfront Payment Requests",
-    body: "Any request for money before you start — registration fees, security deposits, training kit charges — is a scam. Legitimate internships pay you, not the other way around.",
+    tier: "CRITICAL THREAT",
+    tierClass: "tier-critical",
+    title: "Upfront Financial Demands",
+    detail: "Demands for registration fees, refundable laptop security deposits, training kit costs, or software license purchases. Legitimate corporate employers bear all onboarding costs and never charge candidates.",
   },
   {
-    icon: "📧",
-    title: "Personal Email Addresses",
-    body: "Real companies use their own domain (e.g. hr@company.com). If the contact is from Gmail, Yahoo, or Outlook, be very suspicious.",
+    tier: "CRITICAL THREAT",
+    tierClass: "tier-critical",
+    title: "Identity & Credential Harvesting",
+    detail: "Demanding government identity documents (Aadhaar cards, PAN numbers, bank account numbers, IFSC codes) prior to formal interviews or signed bilateral agreements. This data is exploited for synthetic identity theft and loan fraud.",
   },
   {
-    icon: "⏰",
-    title: "Artificial Urgency",
-    body: '"Reply within 2 hours", "limited seats", "offer valid only today" — these are pressure tactics to stop you from verifying the company\'s legitimacy.',
+    tier: "HIGH ANOMALY",
+    tierClass: "tier-high",
+    title: "Unverified Communication Channels",
+    detail: "Official corporate communication originating from consumer email providers (@gmail.com, @yahoo.com) or recruiters communicating exclusively via WhatsApp or Telegram channels rather than verified corporate domains.",
   },
   {
-    icon: "🚫",
-    title: "No Real Interview",
-    body: '"Direct selection", "WhatsApp interview only", or "no interview required" means there\'s no vetting process — a hallmark of fake offers.',
+    tier: "HIGH ANOMALY",
+    tierClass: "tier-high",
+    title: "Bypassed Vetting & Direct Selection",
+    detail: "Offer letters issued with zero technical evaluations, panel interviews, or coding assessments. Scammers rely on instant gratification to disarm student skepticism.",
   },
   {
-    icon: "📋",
-    title: "Vague Job Descriptions",
-    body: '"Easy work from home", "data entry / copy-paste job", "no skills required" — real internships have specific responsibilities and learnings.',
+    tier: "CAUTIONARY SIGNAL",
+    tierClass: "tier-caution",
+    title: "Coercive Artificial Urgency",
+    detail: "Demands such as 'confirm within 2 hours' or 'only 3 slots remaining' designed to trigger panic and prevent candidates from independently cross-verifying the opportunity with their placement cell or company directories.",
   },
   {
-    icon: "💰",
-    title: "Unrealistically High Pay",
-    body: "₹50,000+ per month for a fresher/intern role is extremely unlikely. High pay is used as bait — real stipends are typically ₹5,000–₹20,000.",
-  },
-  {
-    icon: "🆔",
-    title: "Sensitive Info Requests",
-    body: "Asking for Aadhaar, PAN, bank account numbers, or IFSC codes before even issuing an offer letter is a serious red flag — this data can be used for financial fraud.",
+    tier: "CAUTIONARY SIGNAL",
+    tierClass: "tier-caution",
+    title: "Disproportionate Compensation",
+    detail: "Promising ₹50,000–₹1,50,000 per month for basic, entry-level data processing or unskilled tasks. Unrealistic stipends serve as psychological bait to lure students into advance-fee schemes.",
   },
 ];
 
 export default function RedFlagsGuide() {
   return (
-    <section className="red-flags-guide" aria-labelledby="red-flags-title">
+    <section className="red-flags-guide" aria-labelledby="taxonomy-heading">
       <div className="guide-header">
-        <h2 id="red-flags-title">
-          <span className="guide-icon">🚩</span>
-          Common Internship Scam Tactics
+        <div className="guide-badge">
+          <ShieldAlertIcon size={14} />
+          <span>FRAUD TAXONOMY</span>
+        </div>
+        <h2 id="taxonomy-heading" className="guide-title">
+          Internship Threat Vectors & Fraud Signatures
         </h2>
         <p className="guide-subtitle">
-          Know these patterns to protect yourself — whether or not you use the
-          checker above.
+          Standardized forensic indicators utilized by ScamRadar to identify deceptive recruitment campaigns.
         </p>
       </div>
+
       <div className="flags-grid">
-        {flags.map((f) => (
-          <div className="flag-card" key={f.title}>
-            <div className="flag-card-icon" aria-hidden="true">
-              {f.icon}
+        {THREAT_VECTORS.map((v) => (
+          <div className="flag-card" key={v.title}>
+            <div className="flag-card-header">
+              <span className={`flag-tier-badge ${v.tierClass}`}>
+                {v.tier}
+              </span>
             </div>
             <div className="flag-card-content">
-              <h3>{f.title}</h3>
-              <p>{f.body}</p>
+              <h3 className="flag-card-title">{v.title}</h3>
+              <p className="flag-card-detail">{v.detail}</p>
             </div>
           </div>
         ))}
       </div>
-      <div className="guide-footer">
-        <p>
-          💡 <strong>Golden Rule:</strong> When in doubt, look up the company
-          directly on LinkedIn or their official website. Never pay anyone to
-          get a job.
-        </p>
+
+      <div className="guide-footer-callout">
+        <div className="callout-icon-wrap">
+          <InfoIcon size={20} />
+        </div>
+        <div className="callout-content">
+          <h4 className="callout-title">Core Candidate Verification Principle</h4>
+          <p className="callout-text">
+            Never transfer money to secure employment. Independent verification via a company's verified primary domain (e.g. <code>careers.company.com</code>) or verified campus Placement Officer is the authoritative benchmark.
+          </p>
+        </div>
       </div>
     </section>
   );

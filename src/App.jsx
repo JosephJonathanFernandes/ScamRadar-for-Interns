@@ -1,11 +1,19 @@
 import React, { useState } from "react";
-import CheckerForm from "./components/CheckerForm";
-import ResultCard from "./components/ResultCard";
-import RedFlagsGuide from "./components/RedFlagsGuide";
-import TestSuitePage from "./components/TestSuitePage";
+import CheckerForm from "./components/CheckerForm.jsx";
+import ResultCard from "./components/ResultCard.jsx";
+import RedFlagsGuide from "./components/RedFlagsGuide.jsx";
+import TestSuitePage from "./components/TestSuitePage.jsx";
 import { analyzeMessage } from "./core/scanner.js";
 import { checkCompany } from "./core/companyCheck.js";
 import { calibrateResult } from "./core/scoreCalibrator.js";
+import {
+  ShieldIcon,
+  LockIcon,
+  TerminalIcon,
+  FileTextIcon,
+  SearchIcon,
+  DatabaseIcon,
+} from "./components/icons.jsx";
 
 export default function App() {
   const [result, setResult] = useState(null);
@@ -13,26 +21,22 @@ export default function App() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showTestSuite, setShowTestSuite] = useState(false);
 
-  /**
-   * Async: runs company check (network, up to 2 s) then merges company flags
-   * into the synchronous scanner verdict, followed by LLM + RAG precedent analysis.
-   */
   const handleAnalyze = async (text) => {
     setIsAnalyzing(true);
-    setLlmResult(null); // Reset previous LLM result
+    setResult(null);
+    setLlmResult(null);
+
     let analysis;
     try {
       const companyFlags = await checkCompany(text);
       analysis = analyzeMessage(text, companyFlags);
       setResult(calibrateResult(analysis, null));
     } catch {
-      // Should never reach here — checkCompany is already guarded internally,
-      // but just in case, fall back to scanning without company flags.
       analysis = analyzeMessage(text, []);
       setResult(calibrateResult(analysis, null));
     }
 
-    // Call LLM as the primary semantic check for anything not confidently flagged
+    // Call LLM serverless function for ambiguous or non-obvious messages
     if (analysis.verdict !== "Likely Fake") {
       try {
         const response = await fetch("/api/llm-check", {
@@ -70,25 +74,29 @@ export default function App() {
     setLlmResult(null);
   };
 
-  // ── Test Suite View ──────────────────────────────────────────────────────
+  // ── Benchmark Suite View ───────────────────────────────────────────────────
   if (showTestSuite) {
     return (
       <div className="app-root">
         <header className="app-header">
           <div className="header-inner">
             <div className="logo-row">
-              <span className="logo-shield" aria-hidden="true">
-                🛡️
-              </span>
+              <div className="logo-emblem">
+                <ShieldIcon size={22} />
+              </div>
               <div>
-                <h1 className="app-title">ScamRadar for Interns</h1>
+                <div className="title-row">
+                  <h1 className="app-title">ScamRadar</h1>
+                  <span className="app-version-pill">THREAT INTEL</span>
+                </div>
                 <p className="app-tagline">
-                  Is that internship offer real — or a scam?
+                  Internship Offer Threat & Fraud Intelligence
                 </p>
               </div>
             </div>
             <div className="header-badge">
-              <span>🔒 100% Private — no data leaves your device</span>
+              <LockIcon size={13} />
+              <span>Zero Data Retention</span>
             </div>
           </div>
         </header>
@@ -98,14 +106,14 @@ export default function App() {
           </div>
         </main>
         <footer className="app-footer">
-          <p>
-            ScamRadar for Interns is a free, open tool for students. Results are
-            rule-based estimates — always verify independently.
-          </p>
-          <p className="footer-disclaimer">
-            Privacy first. Ambiguous messages may be sent to an AI for secondary
-            analysis, but no data is permanently stored or logged.
-          </p>
+          <div className="footer-inner">
+            <p>
+              ScamRadar Threat Intelligence · Designed for academic & student defense.
+            </p>
+            <p className="footer-disclaimer">
+              Architecture operates with zero persistent storage. No candidate correspondence or extracted transcripts are logged to disk.
+            </p>
+          </div>
         </footer>
       </div>
     );
@@ -114,17 +122,20 @@ export default function App() {
   // ── Main App View ────────────────────────────────────────────────────────
   return (
     <div className="app-root">
-      {/* ── Header ── */}
+      {/* ── Global Header ── */}
       <header className="app-header">
         <div className="header-inner">
           <div className="logo-row">
-            <span className="logo-shield" aria-hidden="true">
-              🛡️
-            </span>
+            <div className="logo-emblem">
+              <ShieldIcon size={22} />
+            </div>
             <div>
-              <h1 className="app-title">ScamRadar for Interns</h1>
+              <div className="title-row">
+                <h1 className="app-title">ScamRadar</h1>
+                <span className="app-version-pill">THREAT INTEL</span>
+              </div>
               <p className="app-tagline">
-                Is that internship offer real — or a scam?
+                Internship Offer Threat & Fraud Intelligence
               </p>
             </div>
           </div>
@@ -132,32 +143,34 @@ export default function App() {
             <button
               className="btn-test-suite"
               onClick={() => setShowTestSuite(true)}
-              title="Open developer test suite"
+              title="Open regression benchmark suite"
               aria-label="Open test suite"
               id="open-test-suite-btn"
             >
-              🧪 Test Suite
+              <TerminalIcon size={14} />
+              <span>Diagnostic Console</span>
             </button>
             <div className="header-badge">
-              <span>🔒 100% Private</span>
+              <LockIcon size={13} />
+              <span>Zero-Retention Security</span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* ── Main ── */}
+      {/* ── Main Content Area ── */}
       <main className="app-main">
         <div className="content-container">
-          {/* ── Checker Card ── */}
+          {/* ── Main Card ── */}
           <div className="checker-card">
             {isAnalyzing ? (
               <div className="analyzing-state" role="status" aria-live="polite">
                 <div className="analyzing-spinner" aria-hidden="true" />
                 <p className="analyzing-label">
-                  Verifying company information…
+                  Evaluating correspondence signatures…
                 </p>
                 <p className="analyzing-sub">
-                  Checking online presence · usually under 2 seconds
+                  Running heuristic pattern scan and domain verification
                 </p>
               </div>
             ) : result ? (
@@ -169,11 +182,10 @@ export default function App() {
             ) : (
               <>
                 <div className="checker-intro">
-                  <h2>Check an Internship Message</h2>
+                  <span className="section-eyebrow">FORENSIC INSPECTION</span>
+                  <h2>Analyze Recruitment Communication</h2>
                   <p>
-                    Got a message from an unknown company? Paste it below (or
-                    upload a screenshot) and we'll scan it for common scam
-                    patterns instantly.
+                    Audit unsolicited internship offers, forwarded messages, and hiring emails against 9 fraud vectors and verified reference precedents.
                   </p>
                 </div>
                 <CheckerForm onAnalyze={handleAnalyze} />
@@ -181,57 +193,65 @@ export default function App() {
             )}
           </div>
 
-          {/* ── How It Works strip ── */}
+          {/* ── Verification Pipeline ── */}
           {!result && !isAnalyzing && (
             <div className="how-it-works">
-              <h2>How it works</h2>
+              <div className="pipeline-header">
+                <span className="pipeline-eyebrow">EVALUATION ARCHITECTURE</span>
+                <h2>Three-Stage Verification Pipeline</h2>
+              </div>
               <div className="steps-row">
-                {[
-                  {
-                    n: "1",
-                    icon: "📋",
-                    label: "Paste message or upload screenshot",
-                  },
-                  {
-                    n: "2",
-                    icon: "🔍",
-                    label: "We scan for 9 red-flag categories",
-                  },
-                  {
-                    n: "3",
-                    icon: "📊",
-                    label: "Instant verdict with specific reasons",
-                  },
-                ].map((s) => (
-                  <div className="step" key={s.n}>
-                    <div className="step-num" aria-hidden="true">
-                      {s.n}
-                    </div>
-                    <div className="step-icon" aria-hidden="true">
-                      {s.icon}
-                    </div>
-                    <p>{s.label}</p>
+                <div className="step-card">
+                  <div className="step-card-top">
+                    <span className="step-idx">STAGE 01</span>
+                    <FileTextIcon size={18} className="step-icon-svg" />
                   </div>
-                ))}
+                  <h3 className="step-title">Ingestion & Normalization</h3>
+                  <p className="step-desc">
+                    Client-side OCR processing with automated WhatsApp timestamp & chat artifact stripping.
+                  </p>
+                </div>
+
+                <div className="step-card">
+                  <div className="step-card-top">
+                    <span className="step-idx">STAGE 02</span>
+                    <SearchIcon size={18} className="step-icon-svg" />
+                  </div>
+                  <h3 className="step-title">Heuristic Threat Audit</h3>
+                  <p className="step-desc">
+                    Regex rule engine scans for advance fees, equipment deposits, domain anomalies, and coercive urgency.
+                  </p>
+                </div>
+
+                <div className="step-card">
+                  <div className="step-card-top">
+                    <span className="step-idx">STAGE 03</span>
+                    <DatabaseIcon size={18} className="step-icon-svg" />
+                  </div>
+                  <h3 className="step-title">Precedent Grounding (RAG)</h3>
+                  <p className="step-desc">
+                    In-memory BM25 matching retrieves real-world reference cases to eliminate false alarms on high-stipend MNC offers.
+                  </p>
+                </div>
               </div>
             </div>
           )}
 
-          {/* ── Always-visible Red Flags Education ── */}
+          {/* ── Threat Taxonomy Guide ── */}
           {!isAnalyzing && <RedFlagsGuide />}
         </div>
       </main>
 
       {/* ── Footer ── */}
       <footer className="app-footer">
-        <p>
-          ScamRadar for Interns is a free, open tool for students. Results are
-          rule-based estimates — always verify independently.
-        </p>
-        <p className="footer-disclaimer">
-          Privacy first. Ambiguous messages may be sent to an AI for secondary
-          analysis, but no data is permanently stored or logged.
-        </p>
+        <div className="footer-inner">
+          <p>
+            ScamRadar Threat Intelligence · Designed for student and fresher defense against fraudulent recruitment campaigns.
+          </p>
+          <p className="footer-disclaimer">
+            Privacy-first architecture. All analyses run without persistent storage or data harvesting.
+          </p>
+        </div>
       </footer>
     </div>
   );

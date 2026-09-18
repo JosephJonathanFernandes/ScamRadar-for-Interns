@@ -1,18 +1,19 @@
 import React, { useState, useRef, useCallback } from "react";
 import { createWorker } from "tesseract.js";
 import { preprocessImageForOCR, stripWhatsAppArtifacts } from "../core/ocr.js";
+import {
+  SearchIcon,
+  UploadIcon,
+  EditIcon,
+  TrashIcon,
+  FileTextIcon,
+  CheckIcon,
+  AlertCircleIcon,
+  XIcon,
+} from "./icons.jsx";
 
 const MAX_CHARS = 5000;
 
-// ─── Component ───────────────────────────────────────────────────────────────
-
-/**
- * ocrStatus state machine:
- *   null      — no image uploaded yet
- *   'loading' — Tesseract running
- *   'review'  — OCR done, showing extracted text for user review
- *   'error'   — OCR failed
- */
 export default function CheckerForm({ onAnalyze }) {
   // Main textarea (direct paste path)
   const [text, setText] = useState("");
@@ -55,7 +56,6 @@ export default function CheckerForm({ onAnalyze }) {
       try {
         sourceForOcr = await preprocessImageForOCR(file);
       } catch {
-        // Fallback to original if canvas preprocessing fails
         sourceForOcr = file;
       }
 
@@ -111,39 +111,37 @@ export default function CheckerForm({ onAnalyze }) {
 
   // ── OCR Review Actions ─────────────────────────────────────────────────────
 
-  /** "Analyze this text →" — run onAnalyze directly with the reviewed OCR text */
   const handleOcrAnalyze = () => {
     if (!ocrEditText.trim()) return;
     onAnalyze(ocrEditText);
   };
 
-  /** "Copy to text box" — moves text to main textarea for further editing */
   const handleOcrCopyToTextbox = () => {
     setText(ocrEditText.slice(0, MAX_CHARS));
-    setOcrStatus("done"); // dismiss review panel
+    setOcrStatus("done");
   };
-
-  // ── Derived state ──────────────────────────────────────────────────────────
 
   const charCount = text.length;
   const isMainReady = text.trim().length > 0 && ocrStatus !== "loading";
   const isOcrReady = ocrEditText.trim().length > 0;
-
-  // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <div className="checker-form-wrap">
       {/* ══ PRIMARY: Direct Text Paste ══════════════════════════════════════ */}
       <form onSubmit={handleMainSubmit} noValidate>
         <div className="form-section">
-          <label htmlFor="message-input" className="form-label">
-            Paste the internship message
-          </label>
+          <div className="form-label-row">
+            <label htmlFor="message-input" className="form-label">
+              Offer Communication or Message Transcript
+            </label>
+            <span className="form-sublabel">Direct Text Inspection</span>
+          </div>
+
           <div className="textarea-wrapper">
             <textarea
               id="message-input"
               className="message-textarea"
-              placeholder={`Paste the WhatsApp forwarded message here…\ne.g. 'Congratulations! You've been selected for a work-from-home internship at XYZ Corp. Registration fee: ₹500 (refundable). Reply within 2 hours.'`}
+              placeholder={`Paste candidate message, email, or forwarded WhatsApp text here…\n\nExample: "Congratulations! You have been selected for the Data Analyst Internship at TechCorp. To confirm your laptop dispatch and onboarding kit, please transfer the refundable security deposit of ₹1,500 via UPI within 24 hours."`}
               value={text}
               onChange={handleTextChange}
               rows={8}
@@ -157,7 +155,7 @@ export default function CheckerForm({ onAnalyze }) {
                   charCount > MAX_CHARS * 0.9 ? "char-count warn" : "char-count"
                 }
               >
-                {charCount} / {MAX_CHARS}
+                {charCount.toLocaleString()} / {MAX_CHARS.toLocaleString()} characters
               </span>
               {text && (
                 <button
@@ -166,7 +164,7 @@ export default function CheckerForm({ onAnalyze }) {
                   onClick={handleClear}
                   aria-label="Clear all input"
                 >
-                  Clear
+                  Clear Input
                 </button>
               )}
             </div>
@@ -180,18 +178,22 @@ export default function CheckerForm({ onAnalyze }) {
           aria-disabled={!isMainReady}
           id="analyze-btn"
         >
-          <span aria-hidden="true">🔍</span> Analyze Message
+          <SearchIcon size={18} />
+          <span>Execute Threat Scan</span>
         </button>
       </form>
 
       {/* ── Divider ── */}
       <div className="divider-or" aria-hidden="true">
-        <span>or</span>
+        <span>OR UPLOAD SCREENSHOT</span>
       </div>
 
       {/* ══ SECONDARY: Image Upload + OCR ══════════════════════════════════ */}
       <div className="form-section">
-        <label className="form-label">Upload a screenshot</label>
+        <div className="form-label-row">
+          <label className="form-label">Screenshot Ingestion</label>
+          <span className="form-sublabel">Client-Side OCR Processing</span>
+        </div>
 
         {/* Drop Zone */}
         <div
@@ -219,14 +221,14 @@ export default function CheckerForm({ onAnalyze }) {
 
           {!imagePreview ? (
             <div className="drop-zone-prompt">
-              <div className="drop-icon" aria-hidden="true">
-                📷
+              <div className="drop-icon-wrap" aria-hidden="true">
+                <UploadIcon size={24} />
               </div>
               <p className="drop-text">
-                Drop image here or <span className="drop-link">browse</span>
+                Drag and drop screenshot here, or <span className="drop-link">browse files</span>
               </p>
               <p className="drop-hint">
-                PNG, JPG, WEBP · Enhanced greyscale preprocessing before OCR
+                PNG, JPG, WEBP supported · Processed 100% locally in browser memory
               </p>
             </div>
           ) : (
@@ -240,7 +242,7 @@ export default function CheckerForm({ onAnalyze }) {
                 {ocrStatus === "loading" && (
                   <div className="ocr-progress-wrap">
                     <div className="ocr-spinner" aria-hidden="true" />
-                    <span>Preprocessing + reading text… {ocrProgress}%</span>
+                    <span>Extracting transcript via Tesseract OCR… {ocrProgress}%</span>
                     <div className="ocr-bar-track">
                       <div
                         className="ocr-bar-fill"
@@ -251,17 +253,20 @@ export default function CheckerForm({ onAnalyze }) {
                 )}
                 {ocrStatus === "review" && (
                   <div className="ocr-done">
-                    ✅ Text extracted — review below before analyzing
+                    <CheckIcon size={16} />
+                    <span>Text extracted successfully — review below before scan</span>
                   </div>
                 )}
                 {ocrStatus === "done" && (
                   <div className="ocr-done">
-                    ✅ Text copied to text box above
+                    <CheckIcon size={16} />
+                    <span>Text transferred to primary inspection console</span>
                   </div>
                 )}
                 {ocrStatus === "error" && (
                   <div className="ocr-error">
-                    ❌ Could not read text. Please paste manually.
+                    <AlertCircleIcon size={16} />
+                    <span>Optical character recognition failed. Please paste text directly.</span>
                   </div>
                 )}
               </div>
@@ -273,8 +278,9 @@ export default function CheckerForm({ onAnalyze }) {
                   handleClear();
                 }}
                 aria-label="Remove image"
+                title="Remove image"
               >
-                ✕
+                <XIcon size={14} />
               </button>
             </div>
           )}
@@ -288,16 +294,15 @@ export default function CheckerForm({ onAnalyze }) {
             aria-label="OCR text review"
           >
             <div className="ocr-review-header">
-              <span className="ocr-review-icon" aria-hidden="true">
-                ✏️
-              </span>
+              <div className="ocr-review-icon-wrap" aria-hidden="true">
+                <EditIcon size={18} />
+              </div>
               <div>
                 <p className="ocr-review-title">
-                  Review extracted text before analyzing
+                  Inspect Extracted Transcript
                 </p>
                 <p className="ocr-review-hint">
-                  OCR on compressed screenshots is imperfect — correct any
-                  obvious errors so the scanner reads the right content.
+                  Review extracted characters to verify key details (amounts, domains, URLs) prior to scan execution.
                 </p>
               </div>
             </div>
@@ -318,25 +323,19 @@ export default function CheckerForm({ onAnalyze }) {
             {ocrData.strippedLines.length > 0 && (
               <details className="ocr-artifacts-details">
                 <summary className="ocr-artifacts-summary">
-                  🗑️ {ocrData.strippedLines.length} WhatsApp metadata line
-                  {ocrData.strippedLines.length > 1 ? "s" : ""} removed from
-                  analysis
-                  <span className="artifacts-expand-hint">
-                    {" "}
-                    (click to view)
+                  <TrashIcon size={14} />
+                  <span>
+                    Filtered {ocrData.strippedLines.length} metadata line
+                    {ocrData.strippedLines.length > 1 ? "s" : ""} (timestamps & headers)
                   </span>
                 </summary>
                 <ul className="ocr-artifacts-list">
                   {ocrData.strippedLines.map((line, i) => (
                     <li key={i} className="ocr-artifact-line">
-                      <span aria-hidden="true">🗑️</span> {line}
+                      <code>{line}</code>
                     </li>
                   ))}
                 </ul>
-                <p className="ocr-artifacts-note">
-                  These lines (timestamps, "Forwarded" labels, etc.) are
-                  excluded from scam detection to avoid noise.
-                </p>
               </details>
             )}
 
@@ -349,15 +348,16 @@ export default function CheckerForm({ onAnalyze }) {
                 onClick={handleOcrAnalyze}
                 id="ocr-analyze-btn"
               >
-                <span aria-hidden="true">🔍</span> Looks good — Analyze this
-                text
+                <SearchIcon size={16} />
+                <span>Execute Scan with Extracted Text</span>
               </button>
               <button
                 type="button"
                 className="btn-ocr-edit"
                 onClick={handleOcrCopyToTextbox}
               >
-                📋 Copy to text box for editing
+                <FileTextIcon size={16} />
+                <span>Transfer to Main Editor</span>
               </button>
             </div>
           </div>
