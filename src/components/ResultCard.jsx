@@ -55,8 +55,10 @@ export default function ResultCard({ result, llmResult, onReset }) {
   const { verdict, percentage, flags } = result;
   const meta = VERDICT_META[verdict] || VERDICT_META["No Red Flags Found"];
   const [barWidth, setBarWidth] = useState(0);
+  const [countDisplay, setCountDisplay] = useState(0);
   const [copied, setCopied] = useState(false);
   const cardRef = useRef(null);
+  const rafRef = useRef(null);
 
   const didLlmRun = llmResult !== null;
 
@@ -88,9 +90,33 @@ Analyzed by ScamRadar Threat Intelligence`;
   };
 
   useEffect(() => {
+    // Animate bar fill
     const t = setTimeout(() => setBarWidth(percentage), 100);
     cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    return () => clearTimeout(t);
+
+    // Count-up animation for score display
+    const duration = 900;
+    const start = performance.now();
+    const from = 0;
+    const to = percentage;
+
+    const tick = (now) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutExpo
+      const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      setCountDisplay(Math.round(from + (to - from) * eased));
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(tick);
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      clearTimeout(t);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, [percentage]);
 
   const hasPayment = flags.some((f) => f.id === "payment_request");
@@ -187,7 +213,12 @@ Analyzed by ScamRadar Threat Intelligence`;
             <p className="threat-desc">Estimated probability of fraudulent recruitment activity</p>
           </div>
           <div className="threat-score-wrap">
-            <span className="threat-score-value">{percentage}</span>
+            <span
+              className="threat-score-value"
+              style={{ color: meta.barColor }}
+            >
+              {countDisplay}
+            </span>
             <span className="threat-score-denom">/ 100</span>
           </div>
         </div>
@@ -204,7 +235,6 @@ Analyzed by ScamRadar Threat Intelligence`;
             style={{
               width: `${barWidth}%`,
               backgroundColor: meta.barColor,
-              transition: "width 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           />
         </div>

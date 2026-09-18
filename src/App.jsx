@@ -164,15 +164,26 @@ export default function App() {
           {/* ── Main Card ── */}
           <div className="checker-card">
             {isAnalyzing ? (
-              <div className="analyzing-state" role="status" aria-live="polite">
-                <div className="analyzing-spinner" aria-hidden="true" />
-                <p className="analyzing-label">
-                  Evaluating correspondence signatures…
-                </p>
-                <p className="analyzing-sub">
-                  Running heuristic pattern scan and domain verification
-                </p>
-              </div>
+              <>
+                <div className="top-progress-bar" aria-hidden="true" />
+                <div className="analyzing-state" role="status" aria-live="polite">
+                  <div className="radar-scanner" aria-hidden="true">
+                    <div className="radar-base-ring" />
+                    <div className="radar-inner-ring" />
+                    <div className="radar-sweep-arm" />
+                    <div className="radar-center-dot" />
+                    <div className="radar-ping" />
+                    <div className="radar-ping radar-ping-2" />
+                  </div>
+                  <div className="scanning-stages">
+                    <p className="analyzing-label">Evaluating Correspondence…</p>
+                    <p className="analyzing-sub">Heuristic scan · Domain verification · RAG precedent match</p>
+                    <div className="scanning-dots" aria-hidden="true">
+                      <span /><span /><span />
+                    </div>
+                  </div>
+                </div>
+              </>
             ) : result ? (
               <ResultCard
                 result={result}
