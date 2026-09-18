@@ -41,6 +41,13 @@ export function calibrateResult(ruleResult, llmResult = null, precedents = []) {
     }
   }
 
+  // Ensure raw rule-based verdicts align with percentage bands even when LLM is skipped
+  if (finalVerdict === "Likely Fake") {
+    finalPercentage = Math.max(finalPercentage, 88);
+  } else if (finalVerdict === "Suspicious") {
+    finalPercentage = Math.max(finalPercentage, 55);
+  }
+
   // If no LLM ran or LLM returned an error, return calibrated rule result
   if (!llmResult || llmResult.verdict === "error" || !llmResult.verdict) {
     return {

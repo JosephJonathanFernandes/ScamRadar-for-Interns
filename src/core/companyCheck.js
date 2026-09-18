@@ -233,16 +233,63 @@ function domainSimilarToCompany(companyName, domain) {
 
 const DDG_TIMEOUT_MS = 2000;
 
+const WELL_KNOWN_COMPANIES = new Set([
+  "google",
+  "google india",
+  "wipro",
+  "wipro technologies",
+  "infosys",
+  "tcs",
+  "tata consultancy services",
+  "microsoft",
+  "amazon",
+  "apple",
+  "meta",
+  "netflix",
+  "accenture",
+  "cognizant",
+  "capgemini",
+  "ibm",
+  "hcl",
+  "tech mahindra",
+  "l&t",
+  "larsen & toubro",
+  "reliance",
+  "jio",
+  "swiggy",
+  "zomato",
+  "flipkart",
+  "paytm",
+  "deloitte",
+  "pwc",
+  "ey",
+  "kpmg",
+  "goldman sachs",
+  "jp morgan",
+  "morgan stanley",
+  "cisco",
+  "adobe",
+  "oracle",
+  "salesforce",
+  "intel",
+  "qualcomm",
+]);
+
 /**
  * Queries the DuckDuckGo Instant Answer API.
  *
  * Returns:
- *   true  — a verifiable result was returned
- *   false — definitively no results (company unknown to DDG)
- *   null  — network error / CORS block / timeout → caller skips this flag
+ *   true  — a verifiable result was returned or well-known company
+ *   false — definitively no results
+ *   null  — network error / CORS block / timeout / inconclusive → caller skips this flag
  */
 async function webPresenceCheck(companyName) {
-  const q = encodeURIComponent(`${companyName} company official website`);
+  const norm = companyName.toLowerCase().trim();
+  if (WELL_KNOWN_COMPANIES.has(norm)) {
+    return true;
+  }
+
+  const q = encodeURIComponent(`${companyName}`);
   const url = `https://api.duckduckgo.com/?q=${q}&format=json&no_redirect=1&no_html=1&skip_disambig=1`;
 
   const controller = new AbortController();
@@ -255,13 +302,13 @@ async function webPresenceCheck(companyName) {
 
     const data = await res.json();
 
-    if (data.AbstractText?.trim()) return true;
-    if (data.AbstractURL?.trim()) return true;
-    if (Array.isArray(data.RelatedTopics) && data.RelatedTopics.length > 0)
-      return true;
-    if (data.Redirect?.trim()) return true;
+    if (data.AbstractText?.trim() || data.AbstractURL?.trim() || data.Redirect?.trim()) return true;
+    if (Array.isArray(data.RelatedTopics) && data.RelatedTopics.length > 0) return true;
 
-    return false; // definitive empty response
+    // DDG Instant Answer only indexes Wikipedia/knowledge-base entries.
+    // An empty response does not reliably mean a real-world company does not exist,
+    // so return null (inconclusive) to avoid generating false warnings on legitimate employers.
+    return null;
   } catch {
     clearTimeout(timer);
     return null; // timeout, CORS error, network failure → skip gracefully
