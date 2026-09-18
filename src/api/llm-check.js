@@ -6,16 +6,16 @@ import { retrievePrecedents } from "../core/rag/retriever.js";
  *
  * @returns {string[]} Ordered array of unique API keys
  */
-export function getGroqKeys() {
-  // Load .env automatically if Node supports process.loadEnvFile
-  if (typeof process.loadEnvFile === "function") {
-    try {
-      process.loadEnvFile();
-    } catch {
-      // Ignore if .env is missing or already loaded
-    }
+// Load .env automatically once at startup if running in standalone Node
+if (typeof process.loadEnvFile === "function") {
+  try {
+    process.loadEnvFile();
+  } catch {
+    // Ignore if .env is missing or already loaded
   }
+}
 
+export function getGroqKeys() {
   const discovered = new Set();
 
   // 1. Direct single keys
